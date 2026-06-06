@@ -1,13 +1,12 @@
 const models = require("../models");
 
-// Get all room categories using stored procedure
+// Get all room categories
 function getRoomCategories(req, res) {
-  models.sequelize
-    .query("SELECT * FROM GetRoomCategories")
+  models.RoomCategory.findAll({ order: [["createdAt", "DESC"]] })
     .then((roomcategories) => {
       res.status(200).json({
         success: true,
-        roomcategories: roomcategories[0],
+        roomcategories: roomcategories,
       });
     })
     .catch((err) => {
@@ -18,23 +17,17 @@ function getRoomCategories(req, res) {
     });
 }
 
-// Create a new room category using stored procedure
+// Create a new room category
 function createRoomCategory(req, res) {
   const { category_name, price, description } = req.body;
-  const room_image = req.file ? req.file.filename : null;
+  const image = req.file ? req.file.filename : null;
 
-  models.sequelize
-    .query(
-      "CALL CreateRoomCategory(:category_name, :price, :description, :room_image)",
-      {
-        replacements: {
-          category_name: category_name,
-          price: price,
-          description: description,
-          room_image: room_image,
-        },
-      }
-    )
+  models.RoomCategory.create({
+    category_name,
+    price,
+    description,
+    image,
+  })
     .then(() => {
       res.status(201).json({
         success: true,
@@ -49,25 +42,16 @@ function createRoomCategory(req, res) {
     });
 }
 
-// Update room category using stored procedure
+// Update room category
 function updateRoomCategory(req, res) {
   const { id } = req.params;
   const { category_name, price, description } = req.body;
-  const room_image = req.file ? req.file.filename : null;
+  const image = req.file ? req.file.filename : null;
 
-  models.sequelize
-    .query(
-      "CALL UpdateRoomCategory(:id, :category_name, :price, :description, :room_image)",
-      {
-        replacements: {
-          id: id,
-          category_name: category_name,
-          price: price,
-          description: description,
-          room_image: room_image,
-        },
-      }
-    )
+  const updateData = { category_name, price, description };
+  if (image) updateData.image = image;
+
+  models.RoomCategory.update(updateData, { where: { id } })
     .then(() => {
       res.status(200).json({
         success: true,
@@ -82,14 +66,11 @@ function updateRoomCategory(req, res) {
     });
 }
 
-// Delete room category using stored procedure
+// Soft delete room category
 function deleteRoomCategory(req, res) {
   const { id } = req.params;
 
-  models.sequelize
-    .query("CALL SoftDeleteRoomCategory(:id)", {
-      replacements: { id: id },
-    })
+  models.RoomCategory.destroy({ where: { id } })
     .then(() => {
       res.status(200).json({
         success: true,

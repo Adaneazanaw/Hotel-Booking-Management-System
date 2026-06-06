@@ -1,12 +1,10 @@
 import {
   Alert,
-  Avatar,
   Breadcrumb,
   Button,
   Label,
   Modal,
   Pagination,
-  Select,
   Spinner,
   Table,
   TableCell,
@@ -17,18 +15,10 @@ import {
   FileInput,
 } from "flowbite-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { React, useEffect, useRef, useState } from "react";
-import { CircularProgressbar } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
+import { React, useEffect, useState } from "react";
+
 import { FaUserEdit } from "react-icons/fa";
-import {
-  HiEye,
-  HiEyeOff,
-  HiHome,
-  HiInformationCircle,
-  HiOutlineExclamationCircle,
-  HiPlusCircle,
-} from "react-icons/hi";
+import { HiHome, HiInformationCircle, HiOutlineExclamationCircle } from "react-icons/hi";
 import { MdDeleteForever } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -45,12 +35,12 @@ export default function DashRoomCategorys() {
   const [imagePreview, setImagePreview] = useState(null);
   const [editImagePreview, setEditImagePreview] = useState(null);
   const [roomCategory, setRoomCategory] = useState([]);
-  const [createLoding, setCreateLoding] = useState(null);
-  const [updateLoding, setUpdateLoding] = useState(null);
-  const [fetchLoding, setFetchLoding] = useState(null);
+  const [createLoading, setCreateLoading] = useState(null);
+  const [updateLoading, setUpdateLoading] = useState(null);
+  const [fetchLoading, setFetchLoading] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [showDeleteConfirmetion, setShowDeleteConfirmetion] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [image, setImage] = useState(null);
   const [currentImage, setCurrentImage] = useState({
@@ -62,16 +52,16 @@ export default function DashRoomCategorys() {
 
   const fetchRoomCategory = async () => {
     try {
-      setFetchLoding(true);
+      setFetchLoading(true);
       const res = await fetch(`/api/roomcategory/getroomcategories`);
       const data = await res.json();
       if (res.ok) {
         setRoomCategory(data.roomcategories);
-        setFetchLoding(false);
+        setFetchLoading(false);
       }
     } catch (error) {
       console.log(error.message);
-      setFetchLoding(false);
+      setFetchLoading(false);
     }
   };
 
@@ -109,7 +99,6 @@ export default function DashRoomCategorys() {
       }
     }
 
-    console.log(editedCategory || formData); // Log the current state
   };
 
   const handleDrop = (files) => {
@@ -133,7 +122,7 @@ export default function DashRoomCategorys() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setCreateLoding(true);
+      setCreateLoading(true);
 
       const formDataToSend = new FormData();
       formDataToSend.append("category_name", formData.category_name);
@@ -169,10 +158,10 @@ export default function DashRoomCategorys() {
           setAlertMessage("");
         }, 5000);
       }
-      setCreateLoding(false);
+      setCreateLoading(false);
     } catch (error) {
       console.log(error.message);
-      setCreateLoding(false);
+      setCreateLoading(false);
     }
   };
 
@@ -188,7 +177,7 @@ export default function DashRoomCategorys() {
       const data = await res.json();
       if (res.ok) {
         fetchRoomCategory(); // Refresh the list after deletion
-        setShowDeleteConfirmetion(false); // Close the modal
+        setShowDeleteConfirmation(false); // Close the modal
         setUserIdToDelete(null); // Clear the ID after deletion
       } else {
         setShowAlert(true);
@@ -204,10 +193,9 @@ export default function DashRoomCategorys() {
   };
 
   const handleEditSubmit = async (e) => {
-    console.log(currentImage);
     e.preventDefault();
     try {
-      setUpdateLoding(true);
+      setUpdateLoading(true);
       const formDataToSend = new FormData();
       formDataToSend.append("category_name", editedCategory.category_name);
       formDataToSend.append("price", editedCategory.price);
@@ -218,7 +206,7 @@ export default function DashRoomCategorys() {
         formDataToSend.append("image", editedCategory.image);
       }
 
-      console.log(formDataToSend);
+
       const res = await fetch(
         `/api/roomcategory/updateroomcategory/${editedCategory.id}`,
         {
@@ -234,10 +222,10 @@ export default function DashRoomCategorys() {
         setEditedCategory(null); // Clear the edited category
         setImagePreview(null); // Clear image preview after editing
         setEditImagePreview(null); // Clear edit image preview on successful update
-        setUpdateLoding(false);
+        setUpdateLoading(false);
         setImage(null);
       } else {
-        setUpdateLoding(false);
+        setUpdateLoading(false);
         setShowAlert(true);
         setImage(null);
         setAlertMessage(data.message);
@@ -248,7 +236,7 @@ export default function DashRoomCategorys() {
       }
     } catch (error) {
       console.log(error.message);
-      setUpdateLoding(false);
+      setUpdateLoading(false);
     }
   };
 
@@ -271,8 +259,8 @@ export default function DashRoomCategorys() {
           </Breadcrumb>
 
           <Modal
-            show={showDeleteConfirmetion}
-            onClose={() => setShowDeleteConfirmetion(false)}
+            show={showDeleteConfirmation}
+            onClose={() => setShowDeleteConfirmation(false)}
             popup
             size="md"
           >
@@ -287,7 +275,7 @@ export default function DashRoomCategorys() {
                 <div className="text-center">
                   <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
                   <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
-                    Are you sure you want to delete this user?
+                    Are you sure you want to delete this category?
                   </h3>
                   <div className="flex justify-center gap-4">
                     <Button color="failure" onClick={deleteRoomCategoryHandler}>
@@ -295,7 +283,7 @@ export default function DashRoomCategorys() {
                     </Button>
                     <Button
                       color="gray"
-                      onClick={() => setShowDeleteConfirmetion(false)}
+                      onClick={() => setShowDeleteConfirmation(false)}
                     >
                       No, cancel
                     </Button>
@@ -390,9 +378,9 @@ export default function DashRoomCategorys() {
                   <Button
                     className="bg-customBlue"
                     type="submit"
-                    disabled={updateLoding}
+                    disabled={updateLoading}
                   >
-                    {updateLoding ? (
+                    {updateLoading ? (
                       <>
                         <Spinner size="sm" />
                         <span className="pl-3">Updating...</span>
@@ -545,12 +533,12 @@ export default function DashRoomCategorys() {
                   <Button
                     className="bg-customBlue"
                     type="submit"
-                    disabled={createLoding}
+                    disabled={createLoading}
                   >
-                    {createLoding ? (
+                    {createLoading ? (
                       <>
                         <Spinner size="sm" />
-                        <span className="pl-3">Loading...</span>
+                        <span className="pl-3">Creating...</span>
                       </>
                     ) : (
                       "Create Room Category"
@@ -562,7 +550,7 @@ export default function DashRoomCategorys() {
 
             {/* right side */}
             <div className="flex-[6] ">
-              {fetchLoding ? (
+              {fetchLoading ? (
                 <div className="flex justify-center items-center h-96">
                   <Spinner size="xl" />
                 </div>
@@ -576,7 +564,7 @@ export default function DashRoomCategorys() {
                           <TableHeadCell style={{ width: "200px" }}>
                             Room
                           </TableHeadCell>
-                          <TableHeadCell>description</TableHeadCell>
+                          <TableHeadCell>Description</TableHeadCell>
 
                           <TableHeadCell>
                             <span className="sr-only">Edit</span>
@@ -622,7 +610,6 @@ export default function DashRoomCategorys() {
                                               image: roomCategory.image,
                                             }
                                       );
-                                      console.log(currentImage);
                                     }}
                                     color="gray"
                                     className="w-full mb-2"
@@ -633,7 +620,7 @@ export default function DashRoomCategorys() {
 
                                   <Button
                                     onClick={() => {
-                                      setShowDeleteConfirmetion(true); // Open the modal
+                                      setShowDeleteConfirmation(true); // Open the modal
                                       setUserIdToDelete(roomCategory.id); // Set the ID of the category to delete
                                     }}
                                     color="gray"
@@ -643,10 +630,6 @@ export default function DashRoomCategorys() {
                                   </Button>
                                 </div>
                               </TableCell>
-                            </TableRow>
-                            {/* hr line */}
-                            <TableRow>
-                              <hr className="border-gray-200 dark:border-gray-700" />
                             </TableRow>
                           </Table.Body>
                         ))}

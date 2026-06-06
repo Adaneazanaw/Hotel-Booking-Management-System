@@ -1,78 +1,94 @@
 const models = require("../models");
 
-// Create a new check-in using stored procedure
+const CHECKED_DETAILS_QUERY = `
+  SELECT b.id, b.id as booking_id, b.reference_number, b.room_id, b.customer_id,
+         b.date_in, b.date_out, b.status as booking_status,
+         b.createdAt, b.updatedAt,
+         c.name as customer_name, c.email as customer_email,
+         c.contact_no as customer_phone,
+         r.room_name, r.category_id, r.status as room_status,
+         rc.category_name as room_category_name, rc.price,
+         (julianday(b.date_out) - julianday(b.date_in)) * rc.price as total_price
+  FROM Bookings b
+  LEFT JOIN Customers c ON b.customer_id = c.id
+  LEFT JOIN Rooms r ON b.room_id = r.id
+  LEFT JOIN RoomCategories rc ON r.category_id = rc.id
+  WHERE b.deletedAt IS NULL
+`;
+
+// Check in a booking
 function checkIn(req, res) {
   const { booking_id } = req.body;
-  const status = "Checked-in";
 
-  if (!booking_id) {
-    return res.status(400).json({
-      success: false,
-      message: "Booking ID is required.",
-    });
-  }
+  if (!booking_id)
+    return res.status(400).json({ success: false, message: "Booking ID is required." });
 
-  models.sequelize
-    .query("CALL CheckIn(:booking_id, :status)", {
-      replacements: { booking_id, status },
-    })
-    .then((result) => {
-      res.status(200).json({
-        success: true,
-        message: "Check-in completed successfully",
-        data: result,
-      });
+  models.Booking.findByPk(booking_id)
+    .then((booking) => {
+      if (!booking)
+        return res.status(404).json({ success: false, message: "Booking not found." });
+
+      booking
+        .update({ status: "checked_in" })
+        .then(() => {
+          models.Room.update({ status: "occupied" }, { where: { id: booking.room_id } });
+          models.Checking.create({ booking_id, status: "checked_in" });
+          res.status(200).json({
+            success: true,
+            message: "Check-in completed successfully",
+          });
+        });
     })
     .catch((err) => {
-      res.status(400).json({
-        success: false,
-        message: err.message,
-      });
+      res.status(400).json({ success: false, message: err.message });
     });
 }
 
-// Create a new check-out using stored procedure
+// Check out a booking
 function checkOut(req, res) {
   const { booking_id } = req.body;
-  const status = "Checked-out";
 
-  if (!booking_id) {
-    return res.status(400).json({
-      success: false,
-      message: "Booking ID is required.",
-    });
-  }
+  if (!booking_id)
+    return res.status(400).json({ success: false, message: "Booking ID is required." });
 
-  models.sequelize
-    .query("CALL CheckOut(:booking_id, :status)", {
-      replacements: { booking_id, status },
-    })
-    .then((result) => {
-      res.status(200).json({
-        success: true,
-        message: "Check-out completed successfully",
-        data: result,
-      });
+  models.Booking.findByPk(booking_id)
+    .then((booking) => {
+      if (!booking)
+        return res.status(404).json({ success: false, message: "Booking not found." });
+
+      booking
+        .update({ status: "checked_out" })
+        .then(() => {
+          models.Room.update({ status: "available" }, { where: { id: booking.room_id } });
+          models.Checking.create({ booking_id, status: "checked_out" });
+          res.status(200).json({
+            success: true,
+            message: "Check-out completed successfully",
+          });
+        });
     })
     .catch((err) => {
-      res.status(400).json({
-        success: false,
-        message: err.message,
-      });
+      res.status(400).json({ success: false, message: err.message });
     });
 }
 
-// Cancel a check-in using stored procedure
+// Cancel a check-in (revert booking to confirmed, room to available)
 async function cancelCheckIn(req, res) {
   const { ref_no, room_id } = req.body;
 
   try {
-    await models.sequelize.query(
-      "CALL CancelCheckInProcedure(:ref_no, :room_id)",
-      {
-        replacements: { ref_no, room_id },
-      }
-    );
+    const booking = await models.Booking.findOne({
+      where: { reference_number: ref_no },
+    });
+
+    if (!booking)
+      return res.status(404).json({ success: false, message: "Booking not found." });
+
+    await booking.update({ status: "confirmed" });
+    if (room_id) {
+      await models.Room.update({ status: "available" }, { where: { id: room_id } });
+    }
+
     res.status(200).json({
       success: true,
       message: `Check-in canceled successfully for reference number ${ref_no}.`,
@@ -80,31 +96,48 @@ async function cancelCheckIn(req, res) {
   } catch (error) {
     res.status(400).json({
       success: false,
-      message:
-        error.message || "An error occurred while canceling the check-in.",
+      message: error.message || "An error occurred while canceling the check-in.",
     });
   }
 }
 
-// Edit check-in details using stored procedure
+// Edit check-in details
 async function editCheckIn(req, res) {
   const { ref_no, new_room_id, name, contact_no, date_in, date_out } = req.body;
 
   try {
-    // Call the stored procedure with the necessary parameters
-    await models.sequelize.query(
-      "CALL EditCheckInProcedure(:ref_no, :new_room_id, :name, :contact_no, :date_in, :date_out)",
-      {
-        replacements: {
-          ref_no,
-          new_room_id,
-          name,
-          contact_no,
-          date_in,
-          date_out,
-        },
-      }
-    );
+    const booking = await models.Booking.findOne({
+      where: { reference_number: ref_no },
+    });
+
+    if (!booking)
+      return res.status(404).json({ success: false, message: "Booking not found." });
+
+    const oldRoomId = booking.room_id;
+
+    // Update booking dates and room
+    const updateData = {};
+    if (date_in) updateData.date_in = date_in;
+    if (date_out) updateData.date_out = date_out;
+    if (new_room_id) updateData.room_id = new_room_id;
+
+    await booking.update(updateData);
+
+    // Update customer info if provided
+    if (name || contact_no) {
+      const customerUpdate = {};
+      if (name) customerUpdate.name = name;
+      if (contact_no) customerUpdate.contact_no = contact_no;
+      await models.Customer.update(customerUpdate, {
+        where: { id: booking.customer_id },
+      });
+    }
+
+    // If room changed, update room statuses
+    if (new_room_id && new_room_id !== oldRoomId) {
+      await models.Room.update({ status: "available" }, { where: { id: oldRoomId } });
+      await models.Room.update({ status: "occupied" }, { where: { id: new_room_id } });
+    }
 
     res.status(200).json({
       success: true,
@@ -118,41 +151,43 @@ async function editCheckIn(req, res) {
   }
 }
 
-// Get all Checked table data using view
+// Get all checked-in details
 function getAllDetailsChecked(req, res) {
   models.sequelize
-    .query("SELECT * FROM CheckedDetails")
-    .then((result) => {
+    .query(
+      CHECKED_DETAILS_QUERY +
+        " AND b.status IN ('checked_in', 'checked_out') ORDER BY b.createdAt DESC",
+      { type: models.sequelize.QueryTypes.SELECT }
+    )
+    .then((data) => {
       res.status(200).json({
         success: true,
         message: "Checked data fetched successfully",
-        data: result[0],
+        data: data,
       });
     })
     .catch((err) => {
-      res.status(400).json({
-        success: false,
-        message: err.message,
-      });
+      res.status(400).json({ success: false, message: err.message });
     });
 }
 
-// Get all CheckedOut table data using view
+// Get all checked-out details
 function getAllDetailsCheckedOut(req, res) {
   models.sequelize
-    .query("SELECT * FROM CheckedDetails WHERE status = 1")
-    .then((result) => {
+    .query(
+      CHECKED_DETAILS_QUERY +
+        " AND b.status = 'checked_out' ORDER BY b.createdAt DESC",
+      { type: models.sequelize.QueryTypes.SELECT }
+    )
+    .then((data) => {
       res.status(200).json({
         success: true,
         message: "Checked out data fetched successfully",
-        data: result[0],
+        data: data,
       });
     })
     .catch((err) => {
-      res.status(400).json({
-        success: false,
-        message: err.message,
-      });
+      res.status(400).json({ success: false, message: err.message });
     });
 }
 

@@ -16,17 +16,17 @@ import DashOverView from "../dashboard_pages/DashOverView";
 import DashBookingCreate from "../dashboard_pages/DashBookingCreate";
 
 export default function Dashboard() {
-  const loaction = useLocation();
+  const location = useLocation();
   const [tab, setTab] = useState("");
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(loaction.search);
+    const urlParams = new URLSearchParams(location.search);
     const tabFromUrl = urlParams.get("tab");
     if (tabFromUrl) {
       setTab(tabFromUrl);
     }
-  }, [loaction.search]);
+  }, [location.search]);
 
   return (
     <div className=" flex flex-col md:flex-row">

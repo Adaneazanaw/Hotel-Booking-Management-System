@@ -166,7 +166,7 @@ export default function DashProfile() {
                 Home
               </Breadcrumb.Item>
             </Link>
-            <Breadcrumb.Item>Stores</Breadcrumb.Item>
+            <Breadcrumb.Item>Profile</Breadcrumb.Item>
           </Breadcrumb>
 
           <h1 className="mt-3 mb-3 text-left font-semibold text-xl">
@@ -357,11 +357,8 @@ export default function DashProfile() {
                 >
                   <option value="SelectRole">Select Role</option>
                   <option value="Admin">Admin</option>
-                  <option value="Director">Director</option>
-                  <option value="Seller">Seller</option>
-                  <option value="StoreKeeper">Store Keeper</option>
-                  <option value="StockQA">StockQA</option>
-                  <option value="Accountant">Accountant</option>
+                  <option value="Receptionist">Receptionist</option>
+                  <option value="Manager">Manager</option>
                 </Select>
               </div>
 

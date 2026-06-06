@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 
 app.use(
   cors({
-    origin: "http://hotel-frontend:5173", // Docker container name for frontend
+    origin: ["http://localhost:5173", "http://hotel-frontend:5173"], // Allow both local and Docker
     credentials: true, // Allow cookies to be sent
   })
 );

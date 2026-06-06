@@ -1,12 +1,14 @@
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../assets/logo.png";
-import OAuth from "../components/OAuth";
+import { motion } from "framer-motion";
+import { BsPersonPlus } from "react-icons/bs";
+import image1 from "../assets/heroSlider/1.jpg";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
   const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -17,7 +19,7 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.username || !formData.email || !formData.password) {
-      return setErrorMessage("Please fill out all fields.");
+      return setErrorMessage("Please fill out all required fields.");
     }
     try {
       setLoading(true);
@@ -29,11 +31,13 @@ export default function SignUp() {
       });
       const data = await res.json();
       if (data.success === false) {
+        setLoading(false);
         return setErrorMessage(data.message);
       }
       setLoading(false);
       if (res.ok) {
-        navigate("/sign-in");
+        setSuccessMessage("Account created successfully! Redirecting to sign in...");
+        setTimeout(() => navigate("/sign-in"), 2000);
       }
     } catch (error) {
       setErrorMessage(error.message);
@@ -42,77 +46,97 @@ export default function SignUp() {
   };
 
   return (
-    <div className=" mt-20">
-      <div className="flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-8">
-        {/* left side */}
-        <div className="flex-1">
-          <Link to="/" className="">
-            <img src={logo} alt="" className="w-72" />
+    <div className="min-h-screen flex">
+      {/* ── Left Panel ── */}
+      <div
+        className="hidden md:flex md:w-1/2 bg-cover bg-center relative"
+        style={{ backgroundImage: `url(${image1})` }}
+      >
+        <div className="absolute inset-0 bg-customBlue bg-opacity-80 flex flex-col justify-end p-12">
+          <Link to="/">
+            <span className="text-white font-bold text-xl tracking-wide mb-8 inline-block">🏨 Adane Grand Hotel</span>
           </Link>
-          <p className="text-sm mt-5">
-            <b>Salford & Co</b> is a luxury business hotel, offering top-tier
-            comfort, modern amenities, and tailored services for the busy
-            professional. Experience effortless stays designed for success.
+          <p className="text-gray-300 text-sm leading-relaxed max-w-sm">
+            Create your account to access the Adane Grand Hotel management
+            system and start managing bookings effortlessly.
           </p>
+          <div className="mt-8 flex items-center gap-3">
+            <div className="bg-white bg-opacity-10 p-2 rounded-lg">
+              <BsPersonPlus className="text-yellow-400 text-xl" />
+            </div>
+            <p className="text-gray-300 text-xs">Quick sign-up — takes less than a minute</p>
+          </div>
         </div>
+      </div>
 
-        {/* right side */}
-        <div className="flex-1">
+      {/* ── Right Panel ── */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-white dark:bg-gray-900">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4 }}
+          className="w-full max-w-md"
+        >
+          <Link to="/" className="flex justify-center mb-8 md:hidden">
+            <span className="text-customBlue font-bold text-xl">🏨 Adane Grand Hotel</span>
+          </Link>
+
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-1">
+            Create Account
+          </h1>
+          <p className="text-gray-400 text-sm mb-8">
+            Already have an account?{" "}
+            <Link to="/sign-in" className="text-customBlue font-semibold hover:underline">
+              Sign In
+            </Link>
+          </p>
+
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-            <h3 className="text-2xl font-bold text-gray-700 dark:text-white ">
-              Sign Up
-            </h3>
             <div>
-              <Label value="Your Name" />
-              <TextInput
-                type="text"
-                placeholder="Maleesha"
-                id="username"
-                onChange={handleChange}
-              />
+              <Label value="Username *" />
+              <TextInput type="text" placeholder="john_doe" id="username" onChange={handleChange} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label value="First Name" />
+                <TextInput type="text" placeholder="John" id="firstname" onChange={handleChange} />
+              </div>
+              <div>
+                <Label value="Last Name" />
+                <TextInput type="text" placeholder="Doe" id="lastname" onChange={handleChange} />
+              </div>
             </div>
             <div>
-              <Label value="Your Email" />
-              <TextInput
-                type="email"
-                placeholder="name@company.com"
-                id="email"
-                onChange={handleChange}
-              />
+              <Label value="Email Address *" />
+              <TextInput type="email" placeholder="john@example.com" id="email" onChange={handleChange} />
             </div>
             <div>
-              <Label value="Your Password" />
-              <TextInput
-                type="password"
-                placeholder="***********"
-                id="password"
-                onChange={handleChange}
-              />
+              <Label value="Phone Number" />
+              <TextInput type="tel" placeholder="+1 xxx xxx xxxx" id="phone" onChange={handleChange} />
             </div>
-            <Button className="bg-customBlue" type="submit" disabled={loading}>
+            <div>
+              <Label value="Password *" />
+              <TextInput type="password" placeholder="••••••••••••" id="password" onChange={handleChange} />
+            </div>
+            <Button className="bg-customBlue w-full mt-2" type="submit" disabled={loading}>
               {loading ? (
                 <>
                   <Spinner size="sm" />
-                  <span className="pl-3">Loading...</span>
+                  <span className="pl-3">Creating Account...</span>
                 </>
               ) : (
-                "Sign Up"
+                "Create Account"
               )}
             </Button>
-            <OAuth />
           </form>
-          <div className="flex gap-2 text-sm mt-5">
-            <span>Have an account?</span>
-            <Link to="/sign-in" className="text-blue-500">
-              Sign In
-            </Link>
-          </div>
-          {errorMessage && (
-            <Alert className="mt-5" color="failure">
-              {errorMessage}
-            </Alert>
-          )}
-        </div>
+
+          {successMessage && <Alert className="mt-5" color="success">{successMessage}</Alert>}
+          {errorMessage && <Alert className="mt-5" color="failure">{errorMessage}</Alert>}
+
+          <p className="text-center text-xs text-gray-400 mt-8">
+            © {new Date().getFullYear()} Adane Grand Hotel. All rights reserved.
+          </p>
+        </motion.div>
       </div>
     </div>
   );

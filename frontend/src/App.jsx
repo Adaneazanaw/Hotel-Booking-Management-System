@@ -9,6 +9,7 @@ import Header from "./components/Header";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import Booking from "./pages/Booking";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
@@ -25,6 +26,8 @@ export default function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

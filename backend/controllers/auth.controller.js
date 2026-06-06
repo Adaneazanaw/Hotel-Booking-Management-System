@@ -27,6 +27,9 @@ function signUp(req, res) {
                 bcrypt.hash(req.body.password, salt, function (err, hash) {
                   const user = {
                     username: req.body.username,
+                    firstname: req.body.firstname || null,
+                    lastname: req.body.lastname || null,
+                    phone: req.body.phone || null,
                     email: req.body.email,
                     password: hash,
                     role: "admin",

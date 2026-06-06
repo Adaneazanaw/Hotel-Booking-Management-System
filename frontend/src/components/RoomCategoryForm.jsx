@@ -20,7 +20,7 @@ const RoomCategoryForm = ({
   imageFileUploadingComplete,
   imageFileUploading,
   createUserError,
-  createLoding,
+  createLoading,
 }) => {
   const filePickerRef = useRef(null);
 
@@ -197,20 +197,17 @@ const RoomCategoryForm = ({
             >
               <option value="SelectRole">Select Role</option>
               <option value="Admin">Admin</option>
-              <option value="Director">Director</option>
-              <option value="Seller">Seller</option>
-              <option value="StoreKeeper">Store Keeper</option>
-              <option value="StockQA">StockQA</option>
-              <option value="Accountant">Accountant</option>
+              <option value="Receptionist">Receptionist</option>
+              <option value="Manager">Manager</option>
             </Select>
           </div>
         </div>
         <div className="flex gap-2 justify-end">
-          <Button color="blue" type="submit" disabled={createLoding}>
-            {createLoding ? (
+          <Button color="blue" type="submit" disabled={createLoading}>
+            {createLoading ? (
               <>
                 <Spinner size="sm" />
-                <span className="pl-3">Loading...</span>
+                <span className="pl-3">Updating...</span>
               </>
             ) : (
               "Update User"

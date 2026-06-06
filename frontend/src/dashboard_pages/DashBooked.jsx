@@ -1,39 +1,23 @@
 import {
   Alert,
-  Avatar,
   Breadcrumb,
   Button,
-  Label,
   Modal,
   Pagination,
-  Select,
   Spinner,
   Table,
   TableCell,
   TableHead,
   TableHeadCell,
   TableRow,
-  TextInput,
-  FileInput,
-  ButtonGroup,
   Badge,
 } from "flowbite-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { React, useEffect, useRef, useState } from "react";
-import { CircularProgressbar } from "react-circular-progressbar";
-import { FaSignOutAlt } from "react-icons/fa";
-import { FaSignInAlt } from "react-icons/fa";
-import "react-circular-progressbar/dist/styles.css";
-import { FaUserEdit } from "react-icons/fa";
+import { React, useEffect, useState } from "react";
 import {
-  HiEye,
-  HiEyeOff,
   HiHome,
   HiInformationCircle,
-  HiOutlineExclamationCircle,
-  HiPlusCircle,
 } from "react-icons/hi";
-import { MdDeleteForever } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -48,8 +32,7 @@ export default function DashBooked() {
   });
   const [room, setRoom] = useState([]);
   const [customer, setCustomer] = useState([]);
-  const [createLoding, setCreateLoding] = useState(null);
-  const [fetchLoding, setFetchLoding] = useState(null);
+  const [fetchLoading, setFetchLoading] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [openModal, setOpenModal] = useState(false);
@@ -131,14 +114,14 @@ export default function DashBooked() {
 
   const fetchBookedDetails = async () => {
     try {
-      setFetchLoding(true);
+      setFetchLoading(true);
       const res = await fetch(`/api/booking/get-all-details`);
       const data = await res.json();
       if (res.ok) {
         setBookedDetails(data.data);
-        setFetchLoding(false);
+        setFetchLoading(false);
       } else {
-        setFetchLoding(false);
+        setFetchLoading(false);
         setShowAlert(true);
         setAlertMessage(data.message);
         setTimeout(() => {
@@ -148,7 +131,7 @@ export default function DashBooked() {
       }
     } catch (error) {
       console.log(error.message);
-      setFetchLoding(false);
+      setFetchLoading(false);
     }
   };
 
@@ -178,7 +161,7 @@ export default function DashBooked() {
             All Booking Details
           </h1>
 
-          {fetchLoding ? (
+          {fetchLoading ? (
             <div className="flex justify-center items-center h-96">
               <Spinner size="xl" />
             </div>
@@ -189,9 +172,9 @@ export default function DashBooked() {
                   <Table hoverable className="shadow-md w-full">
                     <TableHead>
                       <TableHeadCell>Ref No</TableHeadCell>
-                      <TableHeadCell>name</TableHeadCell>
+                      <TableHeadCell>Name</TableHeadCell>
                       <TableHeadCell>Email & Phone</TableHeadCell>
-                      <TableHeadCell>room name</TableHeadCell>
+                      <TableHeadCell>Room Name</TableHeadCell>
                       <TableHeadCell>Check In Date</TableHeadCell>
                       <TableHeadCell>Check Out Date</TableHeadCell>
                       <TableHeadCell>No of Days</TableHeadCell>
@@ -261,20 +244,12 @@ export default function DashBooked() {
                               <Badge color="failure" size="lg">
                                 Cancelled
                               </Badge>
-                            ) : bookedDetails.booking_status === "Canceled" ? (
-                              <Badge color="red" size="lg">
-                                Canceled
-                              </Badge>
                             ) : (
                               <Badge color="warning" size="lg">
                                 Pending
                               </Badge>
                             )}
                           </TableCell>
-                        </TableRow>
-                        {/* hr line */}
-                        <TableRow>
-                          <hr className="border-gray-200 dark:border-gray-700" />
                         </TableRow>
                       </Table.Body>
                     ))}

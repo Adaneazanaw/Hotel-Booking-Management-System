@@ -80,23 +80,21 @@ function deleteUser(req, res) {
   });
 }
 
-// Get all customers using view GetAllCustomers in MySQL
+// Get all customers
 function getCustomers(req, res) {
-  try {
-    models.sequelize
-      .query("SELECT * FROM GetAllCustomers")
-      .then((customers) => {
-        res.status(200).json({
-          success: true,
-          customers: customers[0],
-        });
+  models.Customer.findAll({ order: [["createdAt", "DESC"]] })
+    .then((customers) => {
+      res.status(200).json({
+        success: true,
+        customers: customers,
       });
-  } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: err.message,
+    })
+    .catch((err) => {
+      res.status(400).json({
+        success: false,
+        message: err.message,
+      });
     });
-  }
 }
 
 module.exports = {

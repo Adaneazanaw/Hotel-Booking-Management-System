@@ -1,13 +1,12 @@
 const models = require("../models");
 
-// Get all customers using stored procedure
+// Get all customers
 function getCustomers(req, res) {
-  models.sequelize
-    .query("SELECT * FROM GetCustomers")
+  models.Customer.findAll({ order: [["createdAt", "DESC"]] })
     .then((customers) => {
       res.status(200).json({
         success: true,
-        customers: customers[0],
+        customers: customers,
       });
     })
     .catch((err) => {
@@ -18,7 +17,7 @@ function getCustomers(req, res) {
     });
 }
 
-// Create a new customer using stored procedure
+// Create a new customer
 function createCustomer(req, res) {
   const { p_name, p_contact_no, p_email } = req.body;
 
@@ -29,11 +28,12 @@ function createCustomer(req, res) {
     });
   }
 
-  models.sequelize
-    .query("CALL CreateCustomer(:p_name, :p_contact_no, :p_email)", {
-      replacements: { p_name, p_contact_no, p_email },
-    })
-    .then((result) => {
+  models.Customer.create({
+    name: p_name,
+    contact_no: p_contact_no,
+    email: p_email,
+  })
+    .then(() => {
       res.status(201).json({
         success: true,
         message: "Customer created successfully",
@@ -47,16 +47,16 @@ function createCustomer(req, res) {
     });
 }
 
-// Update customer using stored procedure
+// Update customer
 function updateCustomer(req, res) {
   const { id } = req.params;
   const { p_name, p_contact_no, p_email } = req.body;
 
-  models.sequelize
-    .query("CALL UpdateCustomer(:id, :p_name, :p_contact_no, :p_email)", {
-      replacements: { id, p_name, p_contact_no, p_email },
-    })
-    .then((result) => {
+  models.Customer.update(
+    { name: p_name, contact_no: p_contact_no, email: p_email },
+    { where: { id } }
+  )
+    .then(() => {
       res.status(200).json({
         success: true,
         message: "Customer updated successfully",
@@ -70,15 +70,12 @@ function updateCustomer(req, res) {
     });
 }
 
-// Delete customer using stored procedure
+// Delete customer (soft delete)
 function deleteCustomer(req, res) {
   const { id } = req.params;
 
-  models.sequelize
-    .query("CALL DeleteCustomer(:id)", {
-      replacements: { id },
-    })
-    .then((result) => {
+  models.Customer.destroy({ where: { id } })
+    .then(() => {
       res.status(200).json({
         success: true,
         message: "Customer deleted successfully",

@@ -1,39 +1,25 @@
 import {
   Alert,
-  Avatar,
   Breadcrumb,
   Button,
   Label,
   Modal,
   Pagination,
-  Select,
   Spinner,
   Table,
   TableCell,
   TableHead,
   TableHeadCell,
   TableRow,
-  TextInput,
-  FileInput,
-  ButtonGroup,
   Badge,
 } from "flowbite-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { React, useEffect, useRef, useState } from "react";
-import { CircularProgressbar } from "react-circular-progressbar";
-import { FaSignOutAlt, FaWindowClose } from "react-icons/fa";
-import { FaSignInAlt } from "react-icons/fa";
-import "react-circular-progressbar/dist/styles.css";
-import { FaUserEdit } from "react-icons/fa";
+import { React, useEffect, useState } from "react";
+import { FaWindowClose } from "react-icons/fa";
 import {
-  HiEye,
-  HiEyeOff,
   HiHome,
   HiInformationCircle,
-  HiOutlineExclamationCircle,
-  HiPlusCircle,
 } from "react-icons/hi";
-import { MdDeleteForever } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -49,8 +35,8 @@ export default function DashBookingCancel() {
   });
   const [room, setRoom] = useState([]);
   const [customer, setCustomer] = useState([]);
-  const [createLoding, setCreateLoding] = useState(null);
-  const [fetchLoding, setFetchLoding] = useState(null);
+  const [createLoading, setCreateLoading] = useState(null);
+  const [fetchLoading, setFetchLoading] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [openModal, setOpenModal] = useState(false);
@@ -127,14 +113,14 @@ export default function DashBookingCancel() {
 
   const fetchBookedDetails = async () => {
     try {
-      setFetchLoding(true);
+      setFetchLoading(true);
       const res = await fetch(`/api/booking/get-pending-details`);
       const data = await res.json();
       if (res.ok) {
         setBookedDetails(data.data);
-        setFetchLoding(false);
+        setFetchLoading(false);
       } else {
-        setFetchLoding(false);
+        setFetchLoading(false);
         setShowAlert(true);
         setAlertMessage(data.message);
         setTimeout(() => {
@@ -144,22 +130,20 @@ export default function DashBookingCancel() {
       }
     } catch (error) {
       console.log(error.message);
-      setFetchLoding(false);
+      setFetchLoading(false);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Canceling booking...");
-    console.log(selectedBookingId);
     try {
-      setCreateLoding(true);
+      setCreateLoading(true);
       const res = await fetch(`/api/booking/cancel/${selectedBookingId}`, {
         method: "DELETE",
       });
       const data = await res.json();
       if (res.ok) {
-        setCreateLoding(false);
+        setCreateLoading(false);
         setOpenModal(false);
         fetchBookedDetails();
         setShowAlert(true);
@@ -169,7 +153,7 @@ export default function DashBookingCancel() {
           setAlertMessage("");
         }, 10000);
       } else {
-        setCreateLoding(false);
+        setCreateLoading(false);
         setOpenModal(false);
         setShowAlert(true);
         setAlertMessage(data.message);
@@ -180,7 +164,7 @@ export default function DashBookingCancel() {
       }
     } catch (error) {
       console.log(error.message);
-      setCreateLoding(false);
+      setCreateLoading(false);
       setOpenModal(false);
     }
   };
@@ -300,9 +284,9 @@ export default function DashBookingCancel() {
                     <Button
                       className="bg-red-700"
                       type="submit"
-                      disabled={createLoding}
+                      disabled={createLoading}
                     >
-                      {createLoding ? (
+                      {createLoading ? (
                         <>
                           <Spinner size="sm" />
                           <span className="pl-3">Canceling...</span>
@@ -324,7 +308,7 @@ export default function DashBookingCancel() {
             Room Booking Cancel
           </h1>
 
-          {fetchLoding ? (
+          {fetchLoading ? (
             <div className="flex justify-center items-center h-96">
               <Spinner size="xl" />
             </div>
@@ -335,9 +319,9 @@ export default function DashBookingCancel() {
                   <Table hoverable className="shadow-md w-full">
                     <TableHead>
                       <TableHeadCell>Ref No</TableHeadCell>
-                      <TableHeadCell>name</TableHeadCell>
+                      <TableHeadCell>Name</TableHeadCell>
                       <TableHeadCell>Email & Phone</TableHeadCell>
-                      <TableHeadCell>room name</TableHeadCell>
+                      <TableHeadCell>Room Name</TableHeadCell>
                       <TableHeadCell>Check In Date</TableHeadCell>
                       <TableHeadCell>Check Out Date</TableHeadCell>
                       <TableHeadCell>Total Price</TableHeadCell>
@@ -418,10 +402,6 @@ export default function DashBookingCancel() {
                             </Button>
                           </TableCell>
                         </TableRow>
-                        {/* hr line */}
-                        <TableRow>
-                          <hr className="border-gray-200 dark:border-gray-700" />
-                        </TableRow>
                       </Table.Body>
                     ))}
                   </Table>
@@ -439,7 +419,7 @@ export default function DashBookingCancel() {
                 <div className="flex flex-col items-center justify-center h-96">
                   <HiInformationCircle className="text-4xl text-gray-400" />
                   <h1 className="text-xl font-semibold mt-3 text-gray-400">
-                    No any booking to cancel
+                    No bookings to cancel
                   </h1>
                 </div>
               )}

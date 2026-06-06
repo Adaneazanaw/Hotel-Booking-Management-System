@@ -1,51 +1,85 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Button, Carousel, Footer, Card } from "flowbite-react";
-import { Link, useLocation } from "react-router-dom";
-import {
-  BsDribbble,
-  BsFacebook,
-  BsGithub,
-  BsInstagram,
-  BsMailbox,
-  BsPhone,
-  BsTwitter,
-  BsYoutube,
-} from "react-icons/bs";
-import { Link as ScrollLink } from "react-scroll";
-import logo from "../assets/logo.png";
+import { Button, Card, Spinner } from "flowbite-react";
+import { Link } from "react-router-dom";
+import { FaSpa, FaConciergeBell, FaSwimmingPool, FaUtensils } from "react-icons/fa";
+import { BsAward, BsShieldCheck, BsHeartFill, BsStarFill } from "react-icons/bs";
+import FooterComponent from "../components/Footer";
 import image1 from "../assets/heroSlider/1.jpg";
 import image2 from "../assets/heroSlider/2.jpg";
 import image3 from "../assets/heroSlider/3.jpg";
-import room1 from "../assets/rooms/1-lg.png";
+
+const services = [
+  {
+    icon: <FaUtensils className="text-3xl text-customBlue" />,
+    title: "Gourmet Restaurant",
+    description:
+      "Savor exceptional cuisine crafted by our world-class chefs, using fresh, locally sourced ingredients. From hearty breakfasts to fine-dining dinners, every meal is an experience.",
+  },
+  {
+    icon: <FaSpa className="text-3xl text-customBlue" />,
+    title: "Luxury Spa & Wellness",
+    description:
+      "Rejuvenate your body and mind at our award-winning spa. Choose from a curated menu of massages, facials, and holistic treatments delivered by certified therapists.",
+  },
+  {
+    icon: <FaSwimmingPool className="text-3xl text-customBlue" />,
+    title: "Infinity Pool",
+    description:
+      "Unwind in our rooftop infinity pool offering panoramic city views. Open year-round, it's the perfect spot to relax after a busy day.",
+  },
+  {
+    icon: <FaConciergeBell className="text-3xl text-customBlue" />,
+    title: "24/7 Concierge",
+    description:
+      "Our dedicated concierge team is available around the clock to arrange reservations, transport, tours, and any personal requests you may have.",
+  },
+];
+
+const values = [
+  {
+    icon: <BsAward className="text-3xl text-yellow-500" />,
+    title: "Excellence",
+    desc: "We hold every detail to the highest standard, from room cleanliness to the warmth of our welcome.",
+  },
+  {
+    icon: <BsHeartFill className="text-3xl text-rose-500" />,
+    title: "Hospitality",
+    desc: "Genuine care for every guest is at the heart of everything we do. Your comfort is our priority.",
+  },
+  {
+    icon: <BsShieldCheck className="text-3xl text-green-500" />,
+    title: "Integrity",
+    desc: "We operate with full transparency and honesty in every interaction with guests and partners alike.",
+  },
+  {
+    icon: <BsStarFill className="text-3xl text-blue-500" />,
+    title: "Innovation",
+    desc: "We continuously evolve our services to exceed expectations and set new standards in luxury hospitality.",
+  },
+];
 
 export default function AboutUs() {
-  const [fetchLoding, setFetchLoding] = useState(null);
+  const [fetchLoading, setFetchLoading] = useState(false);
   const [roomCategory, setRoomCategory] = useState([]);
 
   const fetchRoomCategory = async () => {
     try {
-      setFetchLoding(true);
+      setFetchLoading(true);
       const res = await fetch(`/api/roomcategory/getroomcategories`);
       const data = await res.json();
-      if (res.ok) {
-        setRoomCategory(data.roomcategories);
-        setFetchLoding(false);
-      }
+      if (res.ok) setRoomCategory(data.roomcategories);
     } catch (error) {
       console.log(error.message);
-      setFetchLoding(false);
+    } finally {
+      setFetchLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchRoomCategory();
-  }, []);
-
-  const rooms = [];
+  useEffect(() => { fetchRoomCategory(); }, []);
 
   return (
-    <div className=" w-full">
+    <div className="w-full">
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -53,214 +87,166 @@ export default function AboutUs() {
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.5 }}
         >
-          <section className="py-16 bg-gray-100" id="rooms">
-            <div className="container mx-auto px-4">
-              <h2 className="text-4xl font-bold text-center mb-4">About Us</h2>
-              <p className="text-center text-lg text-gray-600 mb-12">
-                We are a hotel that is located in the heart of the city. We
-                offer the best services at affordable prices. We have a team of
-                professionals who are always ready to help you with anything you
-                need. We have a wide range of rooms to choose from, so you can
-                find the perfect one for your stay. We also have a restaurant
-                that serves delicious food, and a bar where you can relax and
-                enjoy a drink. We look forward to welcoming you to our hotel!
+          {/* ── Hero Banner ── */}
+          <div
+            className="relative w-full h-72 bg-cover bg-center flex items-center justify-center"
+            style={{ backgroundImage: `url(${image2})` }}
+          >
+            <div className="absolute inset-0 bg-black bg-opacity-60" />
+            <div className="relative text-center text-white px-4">
+              <p className="uppercase tracking-widest text-yellow-400 text-sm font-semibold mb-2">Our Story</p>
+              <h1 className="text-5xl font-bold mb-3">About Us</h1>
+              <p className="text-gray-300 max-w-lg mx-auto">
+                A legacy of luxury, comfort, and exceptional service — welcome to Adane Grand Hotel.
               </p>
             </div>
+          </div>
 
-            <div className="container mx-auto px-4 ">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-32">
+          {/* ── Our Story ── */}
+          <section className="py-20 bg-white dark:bg-gray-900">
+            <div className="container mx-auto px-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
                 <div>
-                  <img src={image1} alt="" className="rounded-lg" width={500} />
+                  <p className="text-customBlue uppercase tracking-widest text-sm font-semibold mb-3">Who We Are</p>
+                  <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-5 leading-tight">
+                    A Landmark of Luxury in the Heart of the City
+                  </h2>
+                  <p className="text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
+                    Founded over 25 years ago, Adane Grand Hotel has earned its reputation as one of the
+                    city's premier luxury destinations. Nestled in the heart of the city, our hotel
+                    blends timeless elegance with modern comfort.
+                  </p>
+                  <p className="text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
+                    We believe that a great stay is built on the details — the perfect thread count,
+                    the warmth of a genuine smile, the quiet assurance that everything is taken care of.
+                    Every member of our team is dedicated to making your experience exceptional.
+                  </p>
+                  <Link to="/booking">
+                    <Button className="bg-customBlue px-8">Explore Our Rooms</Button>
+                  </Link>
                 </div>
-                <div className="hidden md:block">
-                  <img src={image2} alt="" className="rounded-lg" width={500} />
-                </div>
-                <div className="hidden md:block">
-                  <img src={image3} alt="" className="rounded-lg" width={500} />
+                <div className="grid grid-cols-2 gap-4">
+                  <img src={image1} alt="Adane Grand Hotel lobby" className="rounded-2xl shadow-md w-full h-48 object-cover" />
+                  <img src={image2} alt="Luxury suite" className="rounded-2xl shadow-md w-full h-48 object-cover mt-6" />
+                  <img src={image3} alt="Hotel exterior" className="rounded-2xl shadow-md w-full h-48 object-cover col-span-2" />
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="py-16" id="rooms">
+          {/* ── Values ── */}
+          <section className="py-20 bg-gray-50 dark:bg-gray-800">
             <div className="container mx-auto px-4">
-              <h2 className="text-4xl font-bold text-center mb-4">Our Rooms</h2>
-              <p className="text-center text-lg text-gray-600 mb-12">
-                We have a wide range of rooms to choose from, so you can find
-                the perfect one for your stay. All of our rooms are spacious and
-                comfortable, and are equipped with everything you need for a
-                relaxing stay. We also have a team of professionals who are
-                always ready to help you with anything you need. We look forward
-                to welcoming you to our hotel!
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {roomCategory.map((room) => (
-                  <Card
-                    className="max-w-sm mb-5"
-                    imgAlt="Meaningful alt text for an image that is not purely decorative"
-                    imgSrc={`http://localhost:3001/uploads/${room.image}`}
+              <div className="text-center mb-14">
+                <p className="text-customBlue uppercase tracking-widest text-sm font-semibold mb-2">What Drives Us</p>
+                <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">Our Core Values</h2>
+                <p className="text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
+                  These principles shape every decision we make and every experience we create.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {values.map((v, i) => (
+                  <motion.div
+                    key={i}
+                    whileHover={{ y: -5 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                    className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 text-center flex flex-col items-center gap-3"
                   >
-                    <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                      {room.category_name}
-                    </h5>
-                    <p className="font-normal text-gray-700 dark:text-gray-400">
-                      <span>{room.description}</span>
-                    </p>
-                  </Card>
+                    <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-full">{v.icon}</div>
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-white">{v.title}</h3>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{v.desc}</p>
+                  </motion.div>
                 ))}
               </div>
             </div>
           </section>
 
-          <section className="py-16 bg-gray-100" id="rooms">
+          {/* ── Rooms ── */}
+          <section className="py-20 bg-white dark:bg-gray-900">
             <div className="container mx-auto px-4">
-              <h2 className="text-4xl font-bold text-center mb-4">
-                Our Services
-              </h2>
-              <p className="text-center text-lg text-gray-600 mb-12">
-                We offer a wide range of services to make your stay as
-                comfortable and enjoyable as possible. Our team of professionals
-                is always ready to help you with anything you need. We have a
-                restaurant that serves delicious food, a bar where you can relax
-                and enjoy a drink, and a spa where you can pamper yourself. We
-                also offer room service, laundry service, and free Wi-Fi. We
-                look forward to welcoming you to our hotel!
-              </p>
+              <div className="text-center mb-14">
+                <p className="text-customBlue uppercase tracking-widest text-sm font-semibold mb-2">Accommodation</p>
+                <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">Our Rooms &amp; Suites</h2>
+                <p className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+                  Every room is a haven of comfort, thoughtfully furnished and equipped for a perfect stay.
+                </p>
+              </div>
+              {fetchLoading ? (
+                <div className="flex justify-center items-center h-64"><Spinner size="xl" /></div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {roomCategory.map((room) => (
+                    <motion.div key={room.id} whileHover={{ y: -5 }} transition={{ type: "spring", stiffness: 300 }}>
+                      <Card
+                        className="overflow-hidden shadow-md rounded-xl h-full"
+                        imgSrc={`/api/roomcategory/image/${room.image}`}
+                        imgAlt={room.category_name}
+                      >
+                        <h5 className="text-xl font-bold text-gray-800 dark:text-white">{room.category_name}</h5>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{room.description}</p>
+                        <p className="text-customBlue font-bold text-lg">
+                          Rs {room.price}
+                          <span className="text-sm font-normal text-gray-400">/night</span>
+                        </p>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
 
-              <div className="flex gap-4">
-                <Card
-                  className="max-w-sm mb-5"
-                  imgAlt="Meaningful alt text for an image that is not purely decorative"
-                >
-                  <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                    Restaurant
-                  </h5>
-                  <p className="font-normal text-gray-700 dark:text-gray-400">
-                    <span>
-                      Our restaurant serves delicious food that is made with
-                      fresh and locally sourced ingredients. We offer a wide
-                      range of dishes to choose from, so you can find the
-                      perfect one for your taste. We also have a team of
-                      professional chefs who are dedicated to providing you with
-                    </span>
-                  </p>
-                </Card>
-
-                <Card
-                  className="max-w-sm mb-5"
-                  imgAlt="Meaningful alt text for an image that is not purely decorative"
-                >
-                  <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                    Bar
-                  </h5>
-                  <p className="font-normal text-gray-700 dark:text-gray-400">
-                    <span>
-                      Our bar is the perfect place to relax and enjoy a drink
-                      after a long day. We offer a wide range of drinks to
-                      choose from, including cocktails, beers, and wines. We
-                      also have a team of friendly bartenders who are always
-                      ready to serve you. We look forward to welcoming you to
-                      our bar!
-                    </span>
-                  </p>
-                </Card>
-
-                <Card
-                  className="max-w-sm mb-5"
-                  imgAlt="Meaningful alt text for an image that is not purely decorative"
-                >
-                  <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                    Spa
-                  </h5>
-                  <p className="font-normal text-gray-700 dark:text-gray-400">
-                    <span>
-                      Our spa is the perfect place to pamper yourself and relax.
-                      We offer a wide range of treatments to choose from,
-                      including massages, facials, and body scrubs. We also have
-                      a team of professional therapists who are dedicated to
-                      providing you with the best service possible. We look
-                      forward to welcoming you to our spa!
-                    </span>
-                  </p>
-                </Card>
-
-                <Card
-                  className="max-w-sm mb-5"
-                  imgAlt="Meaningful alt text for an image that is not purely decorative"
-                >
-                  <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                    Room Service
-                  </h5>
-                  <p className="font-normal text-gray-700 dark:text-gray-400">
-                    <span>
-                      We offer room service so you can enjoy a delicious meal in
-                      the comfort of your room. We have a wide range of dishes
-                      to choose from, so you can find the perfect one for your
-                      taste. We also offer a selection of drinks and snacks. We
-                      look forward to serving you!
-                    </span>
-                  </p>
-                </Card>
+          {/* ── Services ── */}
+          <section className="py-20 bg-gray-50 dark:bg-gray-800">
+            <div className="container mx-auto px-4">
+              <div className="text-center mb-14">
+                <p className="text-customBlue uppercase tracking-widest text-sm font-semibold mb-2">What We Offer</p>
+                <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">Our Services</h2>
+                <p className="text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
+                  From fine dining to wellness, every service is designed to make your stay extraordinary.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {services.map((s, i) => (
+                  <motion.div
+                    key={i}
+                    whileHover={{ y: -5 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                    className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col gap-4"
+                  >
+                    <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-xl w-fit">{s.icon}</div>
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-white">{s.title}</h3>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed flex-1">{s.description}</p>
+                  </motion.div>
+                ))}
               </div>
             </div>
           </section>
 
-          {/* Footer */}
-          <Footer container>
-            <div className="w-full">
-              <div className="grid w-full justify-between sm:flex sm:justify-between md:flex md:grid-cols-1">
-                <div>
-                  <Link to="/">
-                    <img src={logo} alt="" className="w-48 " />
-                  </Link>
-
-                  <div className="w-96">
-                    <p className="text-gray-600 mt-4 ">
-                      Salford & Co.™ is a luxury hotel that provides the
-                      ultimate comfort and relaxation, with every detail
-                      designed for your ultimate relaxation.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-8 sm:mt-4 sm:grid-cols-3 sm:gap-6">
-                  <div>
-                    <Footer.Title title="services" />
-                    <Footer.LinkGroup col>
-                      <Footer.Link href="">Booking</Footer.Link>
-                      <ScrollLink to="rooms" smooth={true} duration={1000}>
-                        <Footer.Link href="#">Rooms</Footer.Link>
-                      </ScrollLink>
-                    </Footer.LinkGroup>
-                  </div>
-                  <div>
-                    <Footer.Title title="Follow us" />
-                    <Footer.LinkGroup col>
-                      <Footer.Link href="#">Facebook</Footer.Link>
-                      <Footer.Link href="#">Instagram</Footer.Link>
-                    </Footer.LinkGroup>
-                  </div>
-                  <div>
-                    <Footer.Title title="Legal" />
-                    <Footer.LinkGroup col>
-                      <Footer.Link href="#">Privacy Policy</Footer.Link>
-                      <Footer.Link href="#">Terms &amp; Conditions</Footer.Link>
-                    </Footer.LinkGroup>
-                  </div>
-                </div>
-              </div>
-              <Footer.Divider />
-              <div className="w-full sm:flex sm:items-center sm:justify-between">
-                <Footer.Copyright href="#" by="Salford & Co.™" year={2024} />
-                <div className="mt-4 flex space-x-6 sm:mt-0 sm:justify-center">
-                  <Footer.Icon href="#" icon={BsFacebook} />
-                  <Footer.Icon href="#" icon={BsInstagram} />
-                  <Footer.Icon href="#" icon={BsTwitter} />
-                  <Footer.Icon href="#" icon={BsYoutube} />
-                </div>
+          {/* ── CTA ── */}
+          <section className="bg-customBlue text-white py-20">
+            <div className="container mx-auto px-4 text-center">
+              <p className="uppercase tracking-widest text-yellow-400 text-sm font-semibold mb-3">Ready to Experience It?</p>
+              <h2 className="text-4xl font-bold mb-5">Begin Your Luxury Journey Today</h2>
+              <p className="text-gray-300 max-w-xl mx-auto mb-8">
+                Whether you're visiting for business or leisure, Adane Grand Hotel promises an experience you'll never forget.
+              </p>
+              <div className="flex gap-4 justify-center">
+                <Link to="/sign-in">
+                  <Button size="lg" className="bg-yellow-400 text-customBlue font-bold border-0 hover:bg-yellow-300">
+                    Book Your Stay
+                  </Button>
+                </Link>
+                <Link to="/contact-us">
+                  <Button size="lg" color="light" className="bg-transparent border-white text-white hover:bg-white hover:text-customBlue">
+                    Contact Us
+                  </Button>
+                </Link>
               </div>
             </div>
-          </Footer>
+          </section>
+
+          <FooterComponent />
         </motion.div>
       </AnimatePresence>
     </div>

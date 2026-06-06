@@ -1,39 +1,22 @@
 import {
-  Alert,
-  Avatar,
   Breadcrumb,
-  Button,
-  Label,
-  Modal,
   Pagination,
-  Select,
   Spinner,
   Table,
   TableCell,
   TableHead,
   TableHeadCell,
   TableRow,
-  TextInput,
-  FileInput,
-  ButtonGroup,
   Badge,
 } from "flowbite-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { React, useEffect, useRef, useState } from "react";
-import { CircularProgressbar } from "react-circular-progressbar";
-import { FaSignOutAlt, FaBed, FaUsers, FaDollarSign } from "react-icons/fa";
-import { FaSignInAlt } from "react-icons/fa";
-import "react-circular-progressbar/dist/styles.css";
-import { FaUserEdit } from "react-icons/fa";
+import { React, useEffect, useState } from "react";
+import { FaBed, FaUsers, FaDollarSign, FaSignInAlt } from "react-icons/fa";
 import {
-  HiEye,
-  HiEyeOff,
   HiHome,
   HiInformationCircle,
   HiOutlineExclamationCircle,
-  HiPlusCircle,
 } from "react-icons/hi";
-import { MdDeleteForever } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -44,7 +27,7 @@ export default function DashOverView() {
   const [alertMessage, setAlertMessage] = useState("");
 
   // Fetch details
-  const fetchOverViewDetails = async () => {
+  const fetchOverviewDetails = async () => {
     setFetchLoading(true);
     try {
       const response = await fetch("/api/details/details-overview");
@@ -66,7 +49,7 @@ export default function DashOverView() {
   };
 
   useEffect(() => {
-    fetchOverViewDetails();
+    fetchOverviewDetails();
   }, []);
 
   // Ensure that fetchData has a valid structure before rendering
@@ -74,20 +57,6 @@ export default function DashOverView() {
 
   const { currentUser } = useSelector((state) => state.user);
   const [bookedDetails, setBookedDetails] = useState([]);
-
-  const [formData, setFormData] = useState({
-    room_name: "",
-    category_id: "",
-    availability: "",
-  });
-  const [room, setRoom] = useState([]);
-  const [customer, setCustomer] = useState([]);
-  const [createLoding, setCreateLoding] = useState(null);
-  const [fetchLoding, setFetchLoding] = useState(null);
-
-  const [openModal, setOpenModal] = useState(false);
-
-  const [userIdToDelete, setUserIdToDelete] = useState(null);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -164,14 +133,14 @@ export default function DashOverView() {
 
   const fetchBookedDetails = async () => {
     try {
-      setFetchLoding(true);
+      setFetchLoading(true);
       const res = await fetch(`/api/booking/get-all-details`);
       const data = await res.json();
       if (res.ok) {
         setBookedDetails(data.data);
-        setFetchLoding(false);
+        setFetchLoading(false);
       } else {
-        setFetchLoding(false);
+        setFetchLoading(false);
         setShowAlert(true);
         setAlertMessage(data.message);
         setTimeout(() => {
@@ -181,7 +150,7 @@ export default function DashOverView() {
       }
     } catch (error) {
       console.log(error.message);
-      setFetchLoding(false);
+      setFetchLoading(false);
     }
   };
 
@@ -218,15 +187,15 @@ export default function DashOverView() {
                     Check In
                   </h3>
                   <p className="text-2xl font-semibold">
-                    Current Check In :{" "}
-                    {overviewData ? overviewData.Total_Chcek_In : "Loading..."}
+                    Current Check In : {" "}
+                    {overviewData ? overviewData.Total_Check_In : "Loading..."}
                   </p>
                 </div>
                 <FaSignInAlt className="bg-yellow-400 mt-4 text-white rounded-full text-5xl p-3 shadow-lg" />
               </div>
               <div className="flex gap-4 text-sm">
                 <span className="text-yellow-400 font-semibold flex items-center ">
-                  Avalibale Rooms :{" "}
+                  Available Rooms : {" "}
                   {overviewData ? overviewData.Available_Rooms : "Loading..."}
                 </span>
               </div>
@@ -247,7 +216,7 @@ export default function DashOverView() {
               </div>
               <div className="flex gap-4 text-sm">
                 <span className="text-blue-500 font-semibold flex items-center ">
-                  Avalibale Rooms :{" "}
+                  Available Rooms : {" "}
                   {overviewData ? overviewData.Available_Rooms : "Loading..."}
                 </span>
               </div>
@@ -296,11 +265,56 @@ export default function DashOverView() {
             </div>
           </div>
 
+          {/* Booking Status Chart */}
+          {bookedDetails.length > 0 && (
+            <div className="mt-6 mb-6 p-4 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-gray-200">
+              <h2 className="text-lg font-semibold mb-4">Booking Status Distribution</h2>
+              {(() => {
+                const statusCounts = bookedDetails.reduce((acc, booking) => {
+                  const status = booking.booking_status || "pending";
+                  acc[status] = (acc[status] || 0) + 1;
+                  return acc;
+                }, {});
+                const total = bookedDetails.length;
+                const statuses = [
+                  { key: "confirmed", label: "Confirmed", color: "bg-green-500" },
+                  { key: "checked_in", label: "Checked In", color: "bg-indigo-500" },
+                  { key: "checked_out", label: "Checked Out", color: "bg-blue-500" },
+                  { key: "cancelled", label: "Cancelled", color: "bg-red-500" },
+                  { key: "pending", label: "Pending", color: "bg-yellow-400" },
+                ];
+                return (
+                  <div className="space-y-3">
+                    {statuses.map(({ key, label, color }) => {
+                      const count = statusCounts[key] || 0;
+                      const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                      if (count === 0) return null;
+                      return (
+                        <div key={key} className="flex items-center gap-3">
+                          <span className="w-28 text-sm font-medium text-gray-600 dark:text-gray-400">{label}</span>
+                          <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden">
+                            <div
+                              className={`${color} h-full rounded-full flex items-center justify-end pr-2 transition-all duration-500`}
+                              style={{ width: `${Math.max(percentage, 8)}%` }}
+                            >
+                              <span className="text-xs font-bold text-white">{count}</span>
+                            </div>
+                          </div>
+                          <span className="text-sm text-gray-500 w-12 text-right">{percentage}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
           <h1 className="mt-4 mb-3 text-left font-semibold text-xl">
             All Booking Details
           </h1>
 
-          {fetchLoding ? (
+          {fetchLoading ? (
             <div className="flex justify-center items-center h-96">
               <Spinner size="xl" />
             </div>
@@ -311,9 +325,9 @@ export default function DashOverView() {
                   <Table hoverable className="shadow-md w-full">
                     <TableHead>
                       <TableHeadCell>Ref No</TableHeadCell>
-                      <TableHeadCell>name</TableHeadCell>
+                      <TableHeadCell>Name</TableHeadCell>
                       <TableHeadCell>Email & Phone</TableHeadCell>
-                      <TableHeadCell>room name</TableHeadCell>
+                      <TableHeadCell>Room Name</TableHeadCell>
                       <TableHeadCell>Check In Date</TableHeadCell>
                       <TableHeadCell>Check Out Date</TableHeadCell>
                       <TableHeadCell>No of Days</TableHeadCell>
@@ -383,20 +397,12 @@ export default function DashOverView() {
                               <Badge color="failure" size="lg">
                                 Cancelled
                               </Badge>
-                            ) : bookedDetails.booking_status === "Canceled" ? (
-                              <Badge color="red" size="lg">
-                                Canceled
-                              </Badge>
                             ) : (
                               <Badge color="warning" size="lg">
                                 Pending
                               </Badge>
                             )}
                           </TableCell>
-                        </TableRow>
-                        {/* hr line */}
-                        <TableRow>
-                          <hr className="border-gray-200 dark:border-gray-700" />
                         </TableRow>
                       </Table.Body>
                     ))}

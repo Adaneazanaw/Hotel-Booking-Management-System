@@ -1,6 +1,5 @@
 import {
   Alert,
-  Avatar,
   Breadcrumb,
   Button,
   Label,
@@ -14,27 +13,16 @@ import {
   TableHeadCell,
   TableRow,
   TextInput,
-  FileInput,
-  ButtonGroup,
   Badge,
 } from "flowbite-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { React, useEffect, useRef, useState } from "react";
-import { CircularProgressbar } from "react-circular-progressbar";
-import { FaSignOutAlt, FaWindowClose } from "react-icons/fa";
+import { React, useEffect, useState } from "react";
+import { FaWindowClose } from "react-icons/fa";
 import { MdEditSquare } from "react-icons/md";
-import { FaSignInAlt } from "react-icons/fa";
-import "react-circular-progressbar/dist/styles.css";
-import { FaUserEdit } from "react-icons/fa";
 import {
-  HiEye,
-  HiEyeOff,
   HiHome,
   HiInformationCircle,
-  HiOutlineExclamationCircle,
-  HiPlusCircle,
 } from "react-icons/hi";
-import { MdDeleteForever } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -51,8 +39,8 @@ export default function DashBookingEdit() {
   });
   const [room, setRoom] = useState([]);
   const [customer, setCustomer] = useState([]);
-  const [createLoding, setCreateLoding] = useState(null);
-  const [fetchLoding, setFetchLoding] = useState(null);
+  const [createLoading, setCreateLoading] = useState(null);
+  const [fetchLoading, setFetchLoading] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [openModal, setOpenModal] = useState(false);
@@ -140,14 +128,14 @@ export default function DashBookingEdit() {
 
   const fetchBookedDetails = async () => {
     try {
-      setFetchLoding(true);
+      setFetchLoading(true);
       const res = await fetch(`/api/booking/get-pending-details`);
       const data = await res.json();
       if (res.ok) {
         setBookedDetails(data.data);
-        setFetchLoding(false);
+        setFetchLoading(false);
       } else {
-        setFetchLoding(false);
+        setFetchLoading(false);
         setShowAlert(true);
         setAlertMessage(data.message);
         setTimeout(() => {
@@ -157,29 +145,29 @@ export default function DashBookingEdit() {
       }
     } catch (error) {
       console.log(error.message);
-      setFetchLoding(false);
+      setFetchLoading(false);
     }
   };
 
   const fetchRoom = async () => {
     try {
-      setFetchLoding(true);
+      setFetchLoading(true);
       const res = await fetch(`/api/room/getroom-all-details`);
       const data = await res.json();
       if (res.ok) {
         setRoom(data.rooms);
-        setFetchLoding(false);
+        setFetchLoading(false);
       }
     } catch (error) {
       console.log(error.message);
-      setFetchLoding(false);
+      setFetchLoading(false);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setCreateLoding(true);
+      setCreateLoading(true);
       const res = await fetch(`/api/booking/edit`, {
         method: "PUT",
         headers: {
@@ -194,7 +182,7 @@ export default function DashBookingEdit() {
       });
       const data = await res.json();
       if (res.ok) {
-        setCreateLoding(false);
+        setCreateLoading(false);
         fetchBookedDetails();
         setOpenModal(false);
         setShowAlert(true);
@@ -205,7 +193,7 @@ export default function DashBookingEdit() {
         }, 10000);
         fetchRoom();
       } else {
-        setCreateLoding(false);
+        setCreateLoading(false);
         setShowAlert(true);
         setAlertMessage(data.message);
         setTimeout(() => {
@@ -215,7 +203,7 @@ export default function DashBookingEdit() {
       }
     } catch (error) {
       console.log(error.message);
-      setCreateLoding(false);
+      setCreateLoading(false);
     }
   };
 
@@ -428,9 +416,9 @@ export default function DashBookingEdit() {
                     <Button
                       className="bg-green-700"
                       type="submit"
-                      disabled={createLoding}
+                      disabled={createLoading}
                     >
-                      {createLoding ? (
+                      {createLoading ? (
                         <>
                           <Spinner size="sm" />
                           <span className="pl-3">Editing...</span>
@@ -452,7 +440,7 @@ export default function DashBookingEdit() {
             Room Booking Edit
           </h1>
 
-          {fetchLoding ? (
+          {fetchLoading ? (
             <div className="flex justify-center items-center h-96">
               <Spinner size="xl" />
             </div>
@@ -463,9 +451,9 @@ export default function DashBookingEdit() {
                   <Table hoverable className="shadow-md w-full">
                     <TableHead>
                       <TableHeadCell>Ref No</TableHeadCell>
-                      <TableHeadCell>name</TableHeadCell>
+                      <TableHeadCell>Name</TableHeadCell>
                       <TableHeadCell>Email & Phone</TableHeadCell>
-                      <TableHeadCell>room name</TableHeadCell>
+                      <TableHeadCell>Room Name</TableHeadCell>
                       <TableHeadCell>Check In Date</TableHeadCell>
                       <TableHeadCell>Check Out Date</TableHeadCell>
                       <TableHeadCell>Total Price</TableHeadCell>
@@ -546,10 +534,6 @@ export default function DashBookingEdit() {
                             </Button>
                           </TableCell>
                         </TableRow>
-                        {/* hr line */}
-                        <TableRow>
-                          <hr className="border-gray-200 dark:border-gray-700" />
-                        </TableRow>
                       </Table.Body>
                     ))}
                   </Table>
@@ -567,7 +551,7 @@ export default function DashBookingEdit() {
                 <div className="flex flex-col items-center justify-center h-96">
                   <HiInformationCircle className="text-4xl text-gray-400" />
                   <h1 className="text-xl font-semibold mt-3 text-gray-400">
-                    No any booking to cancel
+                    No bookings to edit
                   </h1>
                 </div>
               )}

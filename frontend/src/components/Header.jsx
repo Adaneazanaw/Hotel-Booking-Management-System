@@ -1,25 +1,24 @@
-import { Button, Navbar, TextInput, Dropdown, Avatar } from "flowbite-react";
-import React from "react";
+import { Button, Navbar, Dropdown, Avatar } from "flowbite-react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { AiOutlineSearch } from "react-icons/ai";
-import { FaMoon, FaSun } from "react-icons/fa";
-import logo from "../assets/logo.png";
 import { useSelector, useDispatch } from "react-redux";
-import { toggleTheme } from "../redux/theme/themeSlice";
 import { signoutSuccess } from "../redux/user/userSlice";
 
 export default function Header() {
   const path = useLocation().pathname;
   const dispatch = useDispatch();
-
   const { currentUser } = useSelector((state) => state.user);
-  const theme = useSelector((state) => state.theme.theme);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleSignout = async () => {
     try {
-      const res = await fetch("/api/auth/signout", {
-        method: "POST",
-      });
+      const res = await fetch("/api/auth/signout", { method: "POST" });
       const data = await res.json();
       if (!res.ok) {
         console.log(data.message);
@@ -31,78 +30,77 @@ export default function Header() {
     }
   };
 
+  const navLinks = [
+    { label: "Home", to: "/" },
+    { label: "Rooms", to: "/booking" },
+    { label: "About Us", to: "/about-us" },
+    { label: "Contact Us", to: "/contact-us" },
+  ];
+
   return (
     <Navbar
-      className="border-b-2 sticky top-0 z-50 justify-between"
+      className={`sticky top-0 z-50 transition-shadow duration-300 ${
+        scrolled ? "shadow-md" : "border-b border-gray-100 dark:border-gray-700"
+      }`}
       fluid
-      rounded
     >
       <Link to="/">
-        <img src={logo} alt="" className="w-48 " />
+        <span className="text-customBlue font-bold text-lg tracking-wide">🏨 Adane Grand Hotel</span>
       </Link>
 
-      <div className="flex gap-2 md:order-2">
+      <div className="flex items-center gap-2 md:order-2">
         {currentUser ? (
           <Dropdown
             arrowIcon={false}
             inline
             label={
-              <Avatar alt="user" img={currentUser.profilepicurl} rounded />
+              <Avatar
+                alt={currentUser.username}
+                img={currentUser.profilepicurl || undefined}
+                rounded
+                placeholderInitials={currentUser.username?.[0]?.toUpperCase()}
+              />
             }
           >
             <Dropdown.Header>
-              <span className="block text-sm">@{currentUser.username}</span>
-              <span className="block text-sm font-medium truncate">
+              <span className="block text-sm font-semibold">
+                @{currentUser.username}
+              </span>
+              <span className="block text-xs text-gray-500 truncate">
                 {currentUser.email}
               </span>
             </Dropdown.Header>
-            <Link to="/">
-              <Dropdown.Item>
-                <span className="block text-sm">Home</span>
-              </Dropdown.Item>
-            </Link>
-
-            <Link to="/dashboard?tab=profile">
-              <Dropdown.Item>
-                <span className="block text-sm">Profile</span>
-              </Dropdown.Item>
-            </Link>
-
-            <Link to="/dashboard?tab=dash">
-              <Dropdown.Item>
-                <span className="block text-sm">Dashboard</span>
-              </Dropdown.Item>
-            </Link>
-
+            <Link to="/"><Dropdown.Item>Home</Dropdown.Item></Link>
+            <Link to="/dashboard?tab=profile"><Dropdown.Item>Profile</Dropdown.Item></Link>
+            <Link to="/dashboard?tab=dash"><Dropdown.Item>Dashboard</Dropdown.Item></Link>
             <Dropdown.Divider />
-            <Link onClick={handleSignout}>
-              <Dropdown.Item>
-                <span className="block text-sm">Sign out</span>
-              </Dropdown.Item>
-            </Link>
+            <Dropdown.Item onClick={handleSignout} className="text-red-500">
+              Sign Out
+            </Dropdown.Item>
           </Dropdown>
         ) : (
           <Link to="/sign-in">
-            <Button className="bg-customBlue">Sign In</Button>
+            <Button className="bg-customBlue" size="sm">Sign In</Button>
           </Link>
         )}
-
-        <Navbar.Toggle className="" />
+        <Navbar.Toggle />
       </div>
 
-      <Navbar.Collapse className="mr-24">
-        <Navbar.Link active={path === "/"} as={"div"}>
-          <Link to="/">Home</Link>
-        </Navbar.Link>
-        <Navbar.Link active={path === "/booking"} as={"div"}>
-          <Link to="/booking">Rooms</Link>
-        </Navbar.Link>
-        <Navbar.Link active={path === "/about-us"} as={"div"}>
-          <Link to="/about-us">About Us</Link>
-        </Navbar.Link>
-        <Navbar.Link active={path === "/contact-us"} as={"div"}>
-          <Link to="/contact-us">Contact Us</Link>
-        </Navbar.Link>
+      <Navbar.Collapse className="mr-20">
+        {navLinks.map((link) => (
+          <Navbar.Link key={link.to} active={path === link.to} as="div" className="cursor-pointer">
+            <Link
+              to={link.to}
+              className={`font-medium text-sm ${
+                path === link.to
+                  ? "text-customBlue dark:text-blue-400"
+                  : "text-gray-600 hover:text-customBlue dark:text-gray-300 dark:hover:text-white"
+              }`}
+            >
+              {link.label}
+            </Link>
+          </Navbar.Link>
+        ))}
       </Navbar.Collapse>
     </Navbar>
   );

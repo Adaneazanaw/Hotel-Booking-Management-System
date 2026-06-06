@@ -7,8 +7,9 @@ import {
   signInSuccess,
   signInFailure,
 } from "../redux/user/userSlice";
-import logo from "../assets/logo.png";
-import OAuth from "../components/OAuth";
+import { motion } from "framer-motion";
+import { BsShieldLock } from "react-icons/bs";
+import image1 from "../assets/heroSlider/2.jpg";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
@@ -23,7 +24,7 @@ export default function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.username || !formData.password) {
-      return dispatch(signInFailure("Please fill all the fields"));
+      return dispatch(signInFailure("Please fill in all the fields."));
     }
     try {
       dispatch(signInStart());
@@ -36,7 +37,6 @@ export default function SignIn() {
       if (data.success === false) {
         dispatch(signInFailure(data.message));
       }
-
       if (res.ok) {
         dispatch(signInSuccess(data));
         navigate("/");
@@ -47,32 +47,65 @@ export default function SignIn() {
   };
 
   return (
-    <div className=" mt-20">
-      <div className="flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-8">
-        {/* left side */}
-        <div className="flex-1">
-          <Link to="/" className="">
-            <img src={logo} alt="" className="w-72" />
+    <div className="min-h-screen flex">
+      {/* ── Left Panel ── */}
+      <div
+        className="hidden md:flex md:w-1/2 bg-cover bg-center relative"
+        style={{ backgroundImage: `url(${image1})` }}
+      >
+        <div className="absolute inset-0 bg-customBlue bg-opacity-80 flex flex-col justify-end p-12">
+          <Link to="/">
+            <span className="text-white font-bold text-xl tracking-wide mb-8 inline-block">🏨 Adane Grand Hotel</span>
           </Link>
-          <p className="text-sm mt-5">
-            <b>Salford & Co</b> is a luxury business hotel, offering top-tier
-            comfort, modern amenities, and tailored services for the busy
-            professional. Experience effortless stays designed for success.
+          <p className="text-gray-300 text-sm leading-relaxed max-w-sm">
+            Sign in to access the Adane Grand Hotel management dashboard and
+            manage bookings, rooms, customers, and more.
           </p>
+          <div className="mt-8 flex items-center gap-3">
+            <div className="bg-white bg-opacity-10 p-2 rounded-lg">
+              <BsShieldLock className="text-yellow-400 text-xl" />
+            </div>
+            <p className="text-gray-300 text-xs">Secure, role-based access control</p>
+          </div>
         </div>
+      </div>
 
-        {/* right side */}
-        <div className="flex-1">
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-            <h3 className="text-2xl font-bold text-gray-700 dark:text-white ">
-              Sign In
-            </h3>
+      {/* ── Right Panel ── */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-white dark:bg-gray-900">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4 }}
+          className="w-full max-w-md"
+        >
+          <Link to="/" className="flex justify-center mb-8 md:hidden">
+            <span className="text-customBlue font-bold text-xl">🏨 Adane Grand Hotel</span>
+          </Link>
 
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-1">
+            Sign In
+          </h1>
+          <p className="text-gray-400 text-sm mb-8">
+            Don't have an account?{" "}
+            <Link to="/sign-up" className="text-customBlue font-semibold hover:underline">
+              Create one
+            </Link>
+          </p>
+
+          <Alert color="info" className="mb-6">
+            <span className="font-semibold">Demo credentials — </span>
+            Username:{" "}
+            <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">admin</code>
+            {" "}| Password:{" "}
+            <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">admin</code>
+          </Alert>
+
+          <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             <div>
-              <Label value="User Name" />
+              <Label value="Username" />
               <TextInput
                 type="text"
-                placeholder="user name"
+                placeholder="Enter your username"
                 id="username"
                 onChange={handleChange}
               />
@@ -81,51 +114,31 @@ export default function SignIn() {
               <Label value="Password" />
               <TextInput
                 type="password"
-                placeholder="***********"
+                placeholder="••••••••••••"
                 id="password"
                 onChange={handleChange}
               />
             </div>
-
-            <Button className="bg-customBlue" type="submit" disabled={loading}>
+            <Button className="bg-customBlue w-full mt-2" type="submit" disabled={loading}>
               {loading ? (
                 <>
                   <Spinner size="sm" />
-                  <span className="pl-3">Loading...</span>
+                  <span className="pl-3">Signing In...</span>
                 </>
               ) : (
                 "Sign In"
               )}
             </Button>
-            <OAuth />
           </form>
-          <div className="flex gap-2 text-sm mt-5">
-            <span>Dont Have an account?</span>
-            <Link to="/sign-up" className="text-blue-500">
-              Sign Up
-            </Link>
-          </div>
-          <Alert className="mt-5" color="failure">
-            <b>Note : </b>
-            Use{" "}
-            <code>
-              <b>admin</b>
-            </code>{" "}
-            as username and{" "}
-            <code>
-              <b>admin</b>
-            </code>{" "}
-            as password
-            <br />
-            <br />
-            Don't update or delete the inside the project data
-          </Alert>
+
           {errorMessage && (
-            <Alert className="mt-5" color="failure">
-              {errorMessage}
-            </Alert>
+            <Alert className="mt-5" color="failure">{errorMessage}</Alert>
           )}
-        </div>
+
+          <p className="text-center text-xs text-gray-400 mt-8">
+            © {new Date().getFullYear()} Adane Grand Hotel. All rights reserved.
+          </p>
+        </motion.div>
       </div>
     </div>
   );

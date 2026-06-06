@@ -1,5 +1,6 @@
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 // Function to set storage configuration dynamically
 const dynamicStorage = (folder) =>
@@ -7,6 +8,8 @@ const dynamicStorage = (folder) =>
     destination: function (req, file, cb) {
       const basePath = "./uploads";
       const finalPath = path.join(basePath, folder);
+      // Auto-create the folder if it doesn't exist
+      fs.mkdirSync(finalPath, { recursive: true });
       cb(null, finalPath);
     },
     filename: function (req, file, cb) {

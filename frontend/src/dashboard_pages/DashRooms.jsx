@@ -1,6 +1,5 @@
 import {
   Alert,
-  Avatar,
   Breadcrumb,
   Button,
   Label,
@@ -14,22 +13,16 @@ import {
   TableHeadCell,
   TableRow,
   TextInput,
-  FileInput,
   ButtonGroup,
   Badge,
 } from "flowbite-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { React, useEffect, useRef, useState } from "react";
-import { CircularProgressbar } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
+import { React, useEffect, useState } from "react";
 import { FaUserEdit } from "react-icons/fa";
 import {
-  HiEye,
-  HiEyeOff,
   HiHome,
   HiInformationCircle,
   HiOutlineExclamationCircle,
-  HiPlusCircle,
 } from "react-icons/hi";
 import { MdDeleteForever } from "react-icons/md";
 import { useSelector } from "react-redux";
@@ -46,12 +39,12 @@ export default function DashRooms() {
   });
   const [roomCategory, setRoomCategory] = useState([]);
   const [room, setRoom] = useState([]);
-  const [createLoding, setCreateLoding] = useState(null);
-  const [updateLoding, setUpdateLoding] = useState(null);
-  const [fetchLoding, setFetchLoding] = useState(null);
+  const [createLoading, setCreateLoading] = useState(null);
+  const [updateLoading, setUpdateLoading] = useState(null);
+  const [fetchLoading, setFetchLoading] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [showDeleteConfirmetion, setShowDeleteConfirmetion] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
 
   const [userIdToDelete, setUserIdToDelete] = useState(null);
@@ -59,31 +52,31 @@ export default function DashRooms() {
 
   const fetchRoomCategory = async () => {
     try {
-      setFetchLoding(true);
+      setFetchLoading(true);
       const res = await fetch(`/api/roomcategory/getroomcategories`);
       const data = await res.json();
       if (res.ok) {
         setRoomCategory(data.roomcategories);
-        setFetchLoding(false);
+        setFetchLoading(false);
       }
     } catch (error) {
       console.log(error.message);
-      setFetchLoding(false);
+      setFetchLoading(false);
     }
   };
 
   const fetchRoom = async () => {
     try {
-      setFetchLoding(true);
+      setFetchLoading(true);
       const res = await fetch(`/api/room/getroom-all-details`);
       const data = await res.json();
       if (res.ok) {
         setRoom(data.rooms);
-        setFetchLoding(false);
+        setFetchLoading(false);
       }
     } catch (error) {
       console.log(error.message);
-      setFetchLoding(false);
+      setFetchLoading(false);
     }
   };
 
@@ -106,7 +99,6 @@ export default function DashRooms() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
-    console.log(formData);
   };
 
   const handleEditChange = (e) => {
@@ -129,7 +121,7 @@ export default function DashRooms() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setCreateLoding(true);
+      setCreateLoading(true);
 
       // Send formData as JSON
       const res = await fetch(`/api/room/create`, {
@@ -153,9 +145,9 @@ export default function DashRooms() {
           category_id: "",
           status: "",
         }); // Clear the form after creation
-        setCreateLoding(false);
+        setCreateLoading(false);
       } else {
-        setCreateLoding(false);
+        setCreateLoading(false);
         setShowAlert(true);
         setAlertMessage(data.message);
         setTimeout(() => {
@@ -165,7 +157,7 @@ export default function DashRooms() {
       }
     } catch (error) {
       console.log(error.message);
-      setCreateLoding(false);
+      setCreateLoading(false);
     }
   };
 
@@ -178,7 +170,7 @@ export default function DashRooms() {
       const data = await res.json();
       if (res.ok) {
         fetchRoom(); // Refresh the list after deletion
-        setShowDeleteConfirmetion(false); // Close the modal
+        setShowDeleteConfirmation(false); // Close the modal
         setUserIdToDelete(null); // Clear the ID after deletion
       } else {
         setShowAlert(true);
@@ -196,7 +188,7 @@ export default function DashRooms() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      setUpdateLoding(true);
+      setUpdateLoading(true);
       const res = await fetch(`/api/room/update`, {
         method: "PATCH",
         headers: {
@@ -215,9 +207,9 @@ export default function DashRooms() {
       if (res.ok) {
         fetchRoom(); // Refresh the list after creation
         setOpenModalEdit(false); // Close the modal
-        setUpdateLoding(false);
+        setUpdateLoading(false);
       } else {
-        setUpdateLoding(false);
+        setUpdateLoading(false);
         setShowAlert(true);
         setAlertMessage(data.message);
         setTimeout(() => {
@@ -227,7 +219,7 @@ export default function DashRooms() {
       }
     } catch (error) {
       console.log(error.message);
-      setUpdateLoding(false);
+      setUpdateLoading(false);
     }
   };
 
@@ -250,8 +242,8 @@ export default function DashRooms() {
           </Breadcrumb>
 
           <Modal
-            show={showDeleteConfirmetion}
-            onClose={() => setShowDeleteConfirmetion(false)}
+            show={showDeleteConfirmation}
+            onClose={() => setShowDeleteConfirmation(false)}
             popup
             size="md"
           >
@@ -265,7 +257,7 @@ export default function DashRooms() {
                 <div className="text-center">
                   <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
                   <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
-                    Are you sure you want to delete this user?
+                    Are you sure you want to delete this room?
                   </h3>
                   <div className="flex justify-center gap-4">
                     <Button color="failure" onClick={deleteRoomHandler}>
@@ -273,7 +265,7 @@ export default function DashRooms() {
                     </Button>
                     <Button
                       color="gray"
-                      onClick={() => setShowDeleteConfirmetion(false)}
+                      onClick={() => setShowDeleteConfirmation(false)}
                     >
                       No, cancel
                     </Button>
@@ -340,9 +332,9 @@ export default function DashRooms() {
                   <Button
                     className="bg-customBlue"
                     type="submit"
-                    disabled={updateLoding}
+                    disabled={updateLoading}
                   >
-                    {updateLoding ? (
+                    {updateLoading ? (
                       <>
                         <Spinner size="sm" />
                         <span className="pl-3">Updating...</span>
@@ -416,9 +408,9 @@ export default function DashRooms() {
                   <Button
                     className="bg-customBlue"
                     type="submit"
-                    disabled={createLoding}
+                    disabled={createLoading}
                   >
-                    {createLoding ? (
+                    {createLoading ? (
                       <>
                         <Spinner size="sm" />
                         <span className="pl-3">Loading...</span>
@@ -433,7 +425,7 @@ export default function DashRooms() {
 
             {/* right side */}
             <div className="flex-[6] ">
-              {fetchLoding ? (
+              {fetchLoading ? (
                 <div className="flex justify-center items-center h-96">
                   <Spinner size="xl" />
                 </div>
@@ -443,11 +435,11 @@ export default function DashRooms() {
                     <>
                       <Table hoverable className="shadow-md w-full">
                         <TableHead>
-                          <TableHeadCell>room image</TableHeadCell>
-                          <TableHeadCell>room</TableHeadCell>
-                          <TableHeadCell>category</TableHeadCell>
-                          <TableHeadCell>price</TableHeadCell>
-                          <TableHeadCell>status</TableHeadCell>
+                          <TableHeadCell>Room Image</TableHeadCell>
+                          <TableHeadCell>Room</TableHeadCell>
+                          <TableHeadCell>Category</TableHeadCell>
+                          <TableHeadCell>Price</TableHeadCell>
+                          <TableHeadCell>Status</TableHeadCell>
                           <TableHeadCell>
                             <span className="sr-only">Edit</span>
                           </TableHeadCell>
@@ -459,7 +451,7 @@ export default function DashRooms() {
                                 <div className="flex items-center gap-4">
                                   <div className="w-28 h-16 relative">
                                     <img
-                                      src={`http://localhost:3001/uploads/${room.image}`}
+                                      src={`http://localhost:3001/uploads/${room.category_image}`}
                                       alt=""
                                       className="w-full h-full object-cover rounded-lg"
                                     />
@@ -496,8 +488,8 @@ export default function DashRooms() {
 
                                   <Button
                                     onClick={() => {
-                                      setShowDeleteConfirmetion(true); // Open the modal
-                                      setUserIdToDelete(room.id); // Set the ID of the category to delete
+                                      setShowDeleteConfirmation(true);
+                                      setUserIdToDelete(room.id);
                                     }}
                                     color="gray"
                                     className="w-full mb-2"
@@ -507,10 +499,6 @@ export default function DashRooms() {
                                   </Button>
                                 </ButtonGroup>
                               </TableCell>
-                            </TableRow>
-                            {/* hr line */}
-                            <TableRow>
-                              <hr className="border-gray-200 dark:border-gray-700" />
                             </TableRow>
                           </Table.Body>
                         ))}

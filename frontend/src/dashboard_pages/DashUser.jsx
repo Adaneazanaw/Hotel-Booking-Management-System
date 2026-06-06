@@ -39,7 +39,6 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Profile from "../assets/add-pic.png";
 import { app } from "../firebase";
-
 export default function DashUser() {
   const { currentUser } = useSelector((state) => state.user);
   const [users, setUsers] = useState([]);
@@ -63,7 +62,7 @@ export default function DashUser() {
     useState(false);
 
   const [createUserError, setCreateUserError] = useState(null);
-  const [createLoding, setCreateLoding] = useState(null);
+  const [createLoading, setCreateLoading] = useState(null);
 
   const [errorMessage, setErrorMessage] = useState(null);
 
@@ -82,7 +81,7 @@ export default function DashUser() {
     }
   };
 
-  // Pagiation
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(users.length / itemsPerPage);
@@ -98,18 +97,17 @@ export default function DashUser() {
 
   const fetchUsers = async () => {
     try {
-      setCreateLoding(true);
+      setCreateLoading(true);
       const res = await fetch(`/api/user/getusers`);
       const data = await res.json();
       if (res.ok) {
         setUsers(data.users);
-        setCreateLoding(false);
+        setCreateLoading(false);
       }
     } catch (error) {
       console.log(error.message);
     }
   };
-  console.log(users);
 
   // const handleShowMore = async () => {
   //   const startIndex = users.length;
@@ -150,7 +148,7 @@ export default function DashUser() {
     //   }
     // }
 
-    setCreateLoding(true);
+    setCreateLoading(true);
     setImageFileUploadingComplete(false);
 
     setImageFileUploadError(null);
@@ -176,7 +174,7 @@ export default function DashUser() {
         setImageFile(null);
         setImageFileUrl(null);
         setImageFileUploading(false);
-        setCreateLoding(false);
+        setCreateLoading(false);
         setImageFileUploadingComplete(false);
       },
       () => {
@@ -184,7 +182,7 @@ export default function DashUser() {
           setImageFileUrl(downloadURL);
           setFormData({ ...formData, profilepicurl: downloadURL });
           setImageFileUploading(false);
-          setCreateLoding(false);
+          setCreateLoading(false);
           setImageFileUploadingComplete(true);
         });
       }
@@ -193,12 +191,11 @@ export default function DashUser() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
-    console.log(formData);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setCreateLoding(true);
+    setCreateLoading(true);
     try {
       const res = await fetch("/api/user/create", {
         method: "POST",
@@ -210,26 +207,24 @@ export default function DashUser() {
       const data = await res.json();
       if (!res.ok) {
         setCreateUserError(data.message);
-        setCreateLoding(false);
+        setCreateLoading(false);
         return;
       }
 
       if (res.ok) {
         setCreateUserError(null);
-        setCreateLoding(false);
+        setCreateLoading(false);
         setOpenModal(false);
         fetchUsers();
       }
     } catch (error) {
-      // setCreateUserError("Something went wrong");
-      setCreateLoding(false);
+      setCreateLoading(false);
     }
   };
 
   const handleSubmitUpdate = async (e) => {
     e.preventDefault();
-    setCreateLoding(true);
-    console.log(formData.id);
+    setCreateLoading(true);
     try {
       const res = await fetch(`/api/user/updateuser/${formData.id}`, {
         method: "PUT",
@@ -241,20 +236,18 @@ export default function DashUser() {
       const data = await res.json();
       if (!res.ok) {
         setCreateUserError(data.message);
-        setCreateLoding(false);
+        setCreateLoading(false);
         return;
       }
 
       if (res.ok) {
         setCreateUserError(null);
-        setCreateLoding(false);
+        setCreateLoading(false);
         setOpenModalEdit(false);
         fetchUsers();
-        navigate("/dashboard?tab=users");
       }
     } catch (error) {
-      // setCreateUserError(null);
-      setCreateLoding(false);
+      setCreateLoading(false);
     }
   };
 
@@ -511,9 +504,9 @@ export default function DashUser() {
                       <Button
                         className="bg-customBlue"
                         type="submit"
-                        disabled={createLoding}
+                        disabled={createLoading}
                       >
-                        {createLoding ? (
+                        {createLoading ? (
                           <>
                             <Spinner size="sm" />
                             <span className="pl-3">Loading...</span>
@@ -722,9 +715,9 @@ export default function DashUser() {
                       <Button
                         className="bg-customBlue"
                         type="submit"
-                        disabled={createLoding}
+                        disabled={createLoading}
                       >
-                        {createLoding ? (
+                        {createLoading ? (
                           <>
                             <Spinner size="sm" />
                             <span className="pl-3">Loading...</span>
@@ -754,7 +747,7 @@ export default function DashUser() {
             </Alert>
           )}
 
-          {createLoding ? (
+          {createLoading ? (
             <div className="flex justify-center items-center h-96">
               <Spinner size="xl" />
             </div>
@@ -764,12 +757,12 @@ export default function DashUser() {
                 <>
                   <Table hoverable className="shadow-md w-full">
                     <TableHead>
-                      <TableHeadCell>user name</TableHeadCell>
-                      <TableHeadCell>first name</TableHeadCell>
-                      <TableHeadCell>last name</TableHeadCell>
-                      <TableHeadCell>position</TableHeadCell>
-                      <TableHeadCell>email</TableHeadCell>
-                      <TableHeadCell>phone number</TableHeadCell>
+                      <TableHeadCell>Username</TableHeadCell>
+                      <TableHeadCell>First Name</TableHeadCell>
+                      <TableHeadCell>Last Name</TableHeadCell>
+                      <TableHeadCell>Role</TableHeadCell>
+                      <TableHeadCell>Email</TableHeadCell>
+                      <TableHeadCell>Phone Number</TableHeadCell>
                       <TableHeadCell>
                         <span className="sr-only">Edit</span>
                       </TableHeadCell>

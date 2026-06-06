@@ -19,18 +19,12 @@ import {
 } from "flowbite-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { React, useEffect, useRef, useState } from "react";
-import { CircularProgressbar } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
 import { FaUserEdit } from "react-icons/fa";
 import {
-  HiEye,
-  HiEyeOff,
   HiHome,
   HiInformationCircle,
   HiOutlineExclamationCircle,
-  HiPlusCircle,
 } from "react-icons/hi";
-import { MdDeleteForever } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -49,12 +43,13 @@ export default function DashBookingCreate() {
   const [bookingDetails, setBookingDetails] = useState([]);
 
   const [roomCategory, setRoomCategory] = useState([]);
-  const [createLoding, setCreateLoding] = useState(null);
-  const [updateLoding, setUpdateLoding] = useState(null);
-  const [fetchLoding, setFetchLoding] = useState(null);
+  const [createLoading, setCreateLoading] = useState(null);
+  const [updateLoading, setUpdateLoading] = useState(null);
+  const [fetchLoading, setFetchLoading] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [showDeleteConfirmetion, setShowDeleteConfirmetion] = useState(false);
+  const [alertColor, setAlertColor] = useState("failure");
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [image, setImage] = useState(null);
 
@@ -63,46 +58,46 @@ export default function DashBookingCreate() {
 
   const fetchCustomer = async () => {
     try {
-      setFetchLoding(true);
+      setFetchLoading(true);
       const res = await fetch(`/api/customer/getcustomers`);
       const data = await res.json();
       if (res.ok) {
         setCustomer(data.customers);
-        setFetchLoding(false);
+        setFetchLoading(false);
       }
     } catch (error) {
       console.log(error.message);
-      setFetchLoding(false);
+      setFetchLoading(false);
     }
   };
 
   const fetchRoom = async () => {
     try {
-      setFetchLoding(true);
+      setFetchLoading(true);
       const res = await fetch(`/api/room/getroom-all-details`);
       const data = await res.json();
       if (res.ok) {
         setRoom(data.rooms);
-        setFetchLoding(false);
+        setFetchLoading(false);
       }
     } catch (error) {
       console.log(error.message);
-      setFetchLoding(false);
+      setFetchLoading(false);
     }
   };
 
   const fetchBookingDetails = async () => {
     try {
-      setFetchLoding(true);
+      setFetchLoading(true);
       const res = await fetch(`/api/booking/get-all-details`);
       const data = await res.json();
       if (res.ok) {
         setBookingDetails(data.data);
-        setFetchLoding(false);
+        setFetchLoading(false);
       }
     } catch (error) {
       console.log(error.message);
-      setFetchLoding(false);
+      setFetchLoading(false);
     }
   };
 
@@ -172,7 +167,7 @@ export default function DashBookingCreate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setCreateLoding(true);
+    setCreateLoading(true);
     try {
       const res = await fetch(`/api/booking/create`, {
         method: "POST",
@@ -183,21 +178,27 @@ export default function DashBookingCreate() {
       });
       const data = await res.json();
       if (res.ok) {
-        setCreateLoding(false);
+        setCreateLoading(false);
         setFormData({});
         fetchBookingDetails();
-        setShowAlert(false);
-        setAlertMessage("");
+        setShowAlert(true);
+        setAlertColor("success");
+        setAlertMessage(data.message);
         fetchCustomer();
         fetchRoom();
+        setTimeout(() => {
+          setShowAlert(false);
+          setAlertMessage("");
+        }, 6000);
       } else {
-        setCreateLoding(false);
+        setCreateLoading(false);
         setShowAlert(true);
+        setAlertColor("failure");
         setAlertMessage(data.message);
       }
     } catch (error) {
       console.log(error.message);
-      setCreateLoding(false);
+      setCreateLoading(false);
     }
   };
 
@@ -232,17 +233,19 @@ export default function DashBookingCreate() {
               {showAlert && (
                 <Alert
                   className="mb-3"
-                  color="failure"
+                  color={alertColor}
                   icon={HiInformationCircle}
                 >
-                  <span className="font-medium">Info alert!</span>{" "}
+                  <span className="font-medium">
+                    {alertColor === "success" ? "Success! " : "Error! "}
+                  </span>{" "}
                   {alertMessage}
                 </Alert>
               )}
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 <div>
                   <div className="mb-2 block">
-                    <Label value="Select a customers" />
+                    <Label value="Select a Customer" />
                   </div>
                   <Select
                     onChange={(e) => {
@@ -251,12 +254,13 @@ export default function DashBookingCreate() {
                         customer_id: e.target.value,
                       });
                     }}
-                    placeholder="Select a customer"
+                    required
+                    shadow
                   >
                     <option value="">Select a customer</option>
-                    {customer.map((customer) => (
-                      <option key={customer.id} value={customer.id}>
-                        {customer.name} {" - "} {customer.email}
+                    {customer.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} - {c.email} - {c.contact_no}
                       </option>
                     ))}
                   </Select>
@@ -265,6 +269,17 @@ export default function DashBookingCreate() {
                   <div className="mb-2 block">
                     <Label value="Select a Room" />
                   </div>
+                  <div className="flex gap-4 mb-2 text-sm">
+                    <span className="inline-flex items-center gap-1">
+                      <span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                      Available: {room.filter((r) => r.status.toLowerCase() === "available").length}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                      Occupied: {room.filter((r) => r.status.toLowerCase() !== "available").length}
+                    </span>
+                    <span className="text-gray-500">Total: {room.length}</span>
+                  </div>
                   <Select
                     onChange={(e) => {
                       setFormData({
@@ -272,20 +287,18 @@ export default function DashBookingCreate() {
                         room_id: e.target.value,
                       });
                     }}
-                    placeholder="Select a Room"
+                    required
+                    shadow
                   >
                     <option value="">Select a Room</option>
-                    {room
-                      .filter(
-                        (room) => room.status.toLowerCase() === "available"
-                      )
-                      .map((room) => (
-                        <option key={room.id} value={room.id}>
-                          {room.room_name} {" - "} {room.category_name}{" "}
-                          {" - Rs. "}
-                          {room.price} {" - "} {room.status.toUpperCase()}
+                    {room.map((r) => {
+                      const isAvailable = r.status.toLowerCase() === "available";
+                      return (
+                        <option key={r.id} value={r.id} disabled={!isAvailable}>
+                          {r.room_name} - {r.category_name} - Rs. {r.price} - {isAvailable ? "✅ Available" : "🔴 Occupied"}
                         </option>
-                      ))}
+                      );
+                    })}
                   </Select>
                 </div>
 
@@ -325,12 +338,12 @@ export default function DashBookingCreate() {
                   <Button
                     className="bg-customBlue"
                     type="submit"
-                    disabled={createLoding}
+                    disabled={createLoading}
                   >
-                    {createLoding ? (
+                    {createLoading ? (
                       <>
                         <Spinner size="sm" />
-                        <span className="pl-3">Loading...</span>
+                        <span className="pl-3">Creating...</span>
                       </>
                     ) : (
                       "Create Booking"
@@ -342,7 +355,7 @@ export default function DashBookingCreate() {
 
             {/* Right Side */}
             <div className="flex-[6] ">
-              {fetchLoding ? (
+              {fetchLoading ? (
                 <div className="flex justify-center items-center h-96">
                   <Spinner size="xl" />
                 </div>
@@ -414,21 +427,12 @@ export default function DashBookingCreate() {
                                   <Badge color="failure" size="lg">
                                     Cancelled
                                   </Badge>
-                                ) : bookingDetails.booking_status ===
-                                  "Canceled" ? (
-                                  <Badge color="red" size="lg">
-                                    Canceled
-                                  </Badge>
                                 ) : (
                                   <Badge color="warning" size="lg">
                                     Pending
                                   </Badge>
                                 )}
                               </TableCell>
-                            </TableRow>
-                            {/* hr line */}
-                            <TableRow>
-                              <hr className="border-gray-200 dark:border-gray-700" />
                             </TableRow>
                           </Table.Body>
                         ))}

@@ -1,9 +1,8 @@
 const models = require("../models");
 
-// Get all room using stored procedure
+// Get all rooms
 function getRooms(req, res) {
-  models.sequelize
-    .query("CALL GetRooms()")
+  models.Room.findAll({ order: [["createdAt", "DESC"]] })
     .then((rooms) => {
       res.status(200).json({
         success: true,
@@ -18,16 +17,16 @@ function getRooms(req, res) {
     });
 }
 
-// Create a new room using stored procedure
+// Create a new room
 function createRoom(req, res) {
   const { room_name, category_id } = req.body;
-  const status = "available";
 
-  models.sequelize
-    .query("CALL CreateRoom(:room_name, :category_id, :status)", {
-      replacements: { room_name, category_id, status },
-    })
-    .then((result) => {
+  models.Room.create({
+    room_name,
+    category_id,
+    status: "available",
+  })
+    .then(() => {
       res.status(201).json({
         success: true,
         message: "Room created successfully",
@@ -41,20 +40,15 @@ function createRoom(req, res) {
     });
 }
 
-// Update room category using stored procedure
+// Update room
 function updateRoom(req, res) {
   const { id, room_name, category_id, status } = req.body;
-  console.log(id);
-  models.sequelize
-    .query("CALL UpdateRoom(:id, :room_name, :category_id, :status)", {
-      replacements: {
-        id: id,
-        room_name: room_name,
-        category_id: category_id,
-        status: status,
-      },
-    })
-    .then((result) => {
+
+  models.Room.update(
+    { room_name, category_id, status },
+    { where: { id } }
+  )
+    .then(() => {
       res.status(200).json({
         success: true,
         message: "Room updated successfully",
@@ -68,15 +62,12 @@ function updateRoom(req, res) {
     });
 }
 
-// Delete room category using stored procedure
+// Delete room (soft delete)
 function deleteRoom(req, res) {
   const { id } = req.params;
 
-  models.sequelize
-    .query("CALL DeleteRoom(:id)", {
-      replacements: { id },
-    })
-    .then((result) => {
+  models.Room.destroy({ where: { id } })
+    .then(() => {
       res.status(200).json({
         success: true,
         message: "Room deleted successfully",
@@ -90,14 +81,22 @@ function deleteRoom(req, res) {
     });
 }
 
-// Get all room details using view
+// Get all room details (joined with RoomCategory)
 function getRoomsAllDetails(req, res) {
   models.sequelize
-    .query("SELECT * FROM RoomDetails")
+    .query(
+      `SELECT r.id, r.room_name, r.category_id, r.status, r.createdAt, r.updatedAt,
+              rc.category_name, rc.price, rc.image as category_image, rc.description
+       FROM Rooms r
+       LEFT JOIN RoomCategories rc ON r.category_id = rc.id
+       WHERE r.deletedAt IS NULL
+       ORDER BY r.createdAt DESC`,
+      { type: models.sequelize.QueryTypes.SELECT }
+    )
     .then((rooms) => {
       res.status(200).json({
         success: true,
-        rooms: rooms[0],
+        rooms: rooms,
       });
     })
     .catch((err) => {

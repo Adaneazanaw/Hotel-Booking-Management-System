@@ -1,22 +1,16 @@
 {
   "development": {
-    "username": "root",
-    "password": "1234",
-    "database": "SalfordDB",
-    "host": "mysql",
-    "dialect": "mysql"
+    "dialect": "sqlite",
+    "storage": "./database.sqlite"
   },
   "test": {
-    "username": "root",
-    "password": "1234",
-    "database": "SalfordDB",
-    "host": "mysql",
-    "dialect": "mysql"
+    "dialect": "sqlite",
+    "storage": ":memory:"
   },
   "production": {
     "username": "root",
     "password": "1234",
-    "database": "SalfordDB",
+    "database": "AdaneGrandDB",
     "host": "mysql",
     "dialect": "mysql"
   }
