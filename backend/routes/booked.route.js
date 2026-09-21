@@ -1,7 +1,10 @@
 const express = require("express");
 const bookedController = require("../controllers/booked.controller");
+const verifyToken = require("../utils/verifyUser");
 
 const router = express.Router();
+
+router.use(verifyToken);
 
 router.post("/checkin", bookedController.checkIn);
 router.post("/checkout", bookedController.checkOut);

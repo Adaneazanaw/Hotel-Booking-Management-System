@@ -197,7 +197,7 @@ export default function Home() {
                   {roomCategory.map((room) => (
                     <motion.div key={room.id} whileHover={{ y: -6 }} transition={{ type: "spring", stiffness: 300 }}>
                       <Card
-                        imgSrc={`/api/roomcategory/image/${room.image}`}
+                        imgSrc={`/uploads/${room.image}`}
                         className="overflow-hidden shadow-md rounded-xl h-full"
                       >
                         <div className="flex justify-between items-start">

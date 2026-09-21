@@ -69,6 +69,27 @@ function detailsForOverView(req, res) {
     });
 }
 
+async function getReports(req, res) {
+  try {
+    const [rooms, bookings, customers, payments] = await Promise.all([
+      models.Room.findAll({ attributes: ["status"] }),
+      models.Booking.findAll({ attributes: ["status", "date_in", "date_out"], include: [{ model: models.Room, include: [models.RoomCategory] }] }),
+      models.Customer.count(),
+      models.Payment.findAll({ where: { payment_status: "success" }, attributes: ["amount"] }),
+    ]);
+    const occupancy = rooms.length ? Math.round((rooms.filter((room) => room.status === "occupied").length / rooms.length) * 100) : 0;
+    const revenue = payments.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+    const byStatus = bookings.reduce((result, booking) => {
+      result[booking.status] = (result[booking.status] || 0) + 1;
+      return result;
+    }, {});
+    res.json({ success: true, data: { total_rooms: rooms.length, occupancy_rate: occupancy, total_customers: customers, total_revenue: revenue, bookings_by_status: byStatus } });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
 module.exports = {
   detailsForOverView: detailsForOverView,
+  getReports: getReports,
 };

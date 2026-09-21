@@ -17,6 +17,35 @@ function getRooms(req, res) {
     });
 }
 
+async function getAvailableRooms(req, res) {
+  const { check_in, check_out } = req.query;
+  if (!check_in || !check_out || new Date(check_in) >= new Date(check_out)) {
+    return res.status(400).json({ success: false, message: "Valid check-in and check-out dates are required" });
+  }
+
+  try {
+    const rooms = await models.Room.findAll({
+      where: { status: "available" },
+      include: [{ model: models.RoomCategory }],
+      order: [["room_name", "ASC"]],
+    });
+    const bookings = await models.Booking.findAll({
+      where: { status: ["pending", "confirmed", "checked_in"] },
+      attributes: ["room_id", "date_in", "date_out"],
+    });
+    const start = new Date(check_in);
+    const end = new Date(check_out);
+    const reservedRoomIds = new Set(
+      bookings
+        .filter((booking) => new Date(booking.date_in) < end && new Date(booking.date_out) > start)
+        .map((booking) => booking.room_id)
+    );
+    res.json({ success: true, rooms: rooms.filter((room) => !reservedRoomIds.has(room.id)) });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
 // Create a new room
 function createRoom(req, res) {
   const { room_name, category_id } = req.body;
@@ -109,6 +138,7 @@ function getRoomsAllDetails(req, res) {
 
 module.exports = {
   getRooms: getRooms,
+  getAvailableRooms: getAvailableRooms,
   createRoom: createRoom,
   updateRoom: updateRoom,
   deleteRoom: deleteRoom,

@@ -179,7 +179,7 @@ export default function AboutUs() {
                     <motion.div key={room.id} whileHover={{ y: -5 }} transition={{ type: "spring", stiffness: 300 }}>
                       <Card
                         className="overflow-hidden shadow-md rounded-xl h-full"
-                        imgSrc={`/api/roomcategory/image/${room.image}`}
+                        imgSrc={`/uploads/${room.image}`}
                         imgAlt={room.category_name}
                       >
                         <h5 className="text-xl font-bold text-gray-800 dark:text-white">{room.category_name}</h5>

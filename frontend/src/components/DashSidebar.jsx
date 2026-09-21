@@ -66,7 +66,7 @@ export default function DashSidebar() {
           <Sidebar.Collapse icon={FaBed} label="Booking">
             <Link to="/dashboard?tab=booked">
               <Sidebar.Item
-                active={tab === "booking-booked" || !tab}
+                  active={tab === "booked"}
                 icon={MdBathroom}
                 as="div"
               >
@@ -76,7 +76,7 @@ export default function DashSidebar() {
 
             <Link to="/dashboard?tab=booking-create">
               <Sidebar.Item
-                active={tab === "booking-create" || !tab}
+                active={tab === "booking-create"}
                 icon={IoIosBed}
                 as="div"
               >
@@ -85,7 +85,7 @@ export default function DashSidebar() {
             </Link>
             <Link to="/dashboard?tab=booking-edit">
               <Sidebar.Item
-                active={tab === "booking-edit" || !tab}
+                active={tab === "booking-edit"}
                 icon={MdEditSquare}
                 as="div"
               >
@@ -95,7 +95,7 @@ export default function DashSidebar() {
 
             <Link to="/dashboard?tab=booking-cancel">
               <Sidebar.Item
-                active={tab === "booking-cancel" || !tab}
+                active={tab === "booking-cancel"}
                 icon={FaWindowClose}
                 as="div"
               >
@@ -106,7 +106,7 @@ export default function DashSidebar() {
 
           <Link to="/dashboard?tab=check-in">
             <Sidebar.Item
-              active={tab === "check-in" || !tab}
+              active={tab === "check-in"}
               icon={FaSignInAlt}
               as="div"
             >
@@ -116,7 +116,7 @@ export default function DashSidebar() {
 
           <Link to="/dashboard?tab=check-out">
             <Sidebar.Item
-              active={tab === "check-out" || !tab}
+              active={tab === "check-out"}
               icon={FaSignOutAlt}
               as="div"
             >
@@ -132,11 +132,17 @@ export default function DashSidebar() {
 
           <Link to="/dashboard?tab=rooms">
             <Sidebar.Item
-              active={tab === "rooms" || !tab}
+              active={tab === "rooms"}
               icon={MdBedroomParent}
               as="div"
             >
               Rooms
+            </Sidebar.Item>
+          </Link>
+
+          <Link to="/dashboard?tab=reports">
+            <Sidebar.Item active={tab === "reports"} icon={HiChartPie} as="div">
+              Reports
             </Sidebar.Item>
           </Link>
 

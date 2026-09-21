@@ -8,12 +8,15 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Booking.belongsTo(models.Room, { foreignKey: "room_id" });
+      Booking.belongsTo(models.Customer, { foreignKey: "customer_id" });
+      Booking.hasMany(models.Payment, { foreignKey: "booking_id" });
+      Booking.hasMany(models.Feedback, { foreignKey: "booking_id" });
     }
   }
   Booking.init(
     {
-      reference_number: DataTypes.STRING,
+      reference_number: { type: DataTypes.STRING, unique: true, allowNull: false },
       room_id: DataTypes.INTEGER,
       customer_id: DataTypes.INTEGER,
       date_in: DataTypes.DATE,

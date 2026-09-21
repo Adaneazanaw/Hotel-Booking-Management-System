@@ -15,7 +15,16 @@ if (config.use_env_variable) {
 } else if (config.dialect === 'sqlite') {
   sequelize = new Sequelize({ dialect: 'sqlite', storage: config.storage, logging: false });
 } else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
+  sequelize = new Sequelize(
+    process.env.DB_NAME || config.database,
+    process.env.DB_USER || config.username,
+    process.env.DB_PASSWORD || config.password,
+    {
+      ...config,
+      host: process.env.DB_HOST || config.host,
+      port: process.env.DB_PORT || config.port,
+    }
+  );
 }
 
 fs

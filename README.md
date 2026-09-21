@@ -27,24 +27,12 @@ This project is a comprehensive Hotel Booking Management System designed to stre
 - Manage user roles and permissions (Admin, Staff, Customer).
 
 ### 5. Security Features
-- Encrypted user passwords using industry-standard algorithms.
-- Role-based access control (RBAC) for sensitive operations.
-- Regular security audits for database and APIs.
 
----
 
 ## Technologies Used
 
 ### Backend
 - **Node.js**: For server-side logic and API management.
-- **Express.js**: For building robust RESTful APIs.
-- **Sequelize ORM**: For database interaction and migrations.
-- **MySQL**: As the primary relational database.
-
-### Frontend
-- **React.js**: For building an interactive user interface.
-- **Redux**: For state management.
-- **Tailwind CSS**: For responsive and modern UI design.
 
 ### Other Tools
 - **Docker**: For containerizing the application and managing environments.

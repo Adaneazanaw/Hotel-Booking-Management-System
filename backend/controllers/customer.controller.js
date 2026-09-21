@@ -89,9 +89,22 @@ function deleteCustomer(req, res) {
     });
 }
 
+async function getCustomerBookingHistory(req, res) {
+  try {
+    const customer = await models.Customer.findByPk(req.params.id, {
+      include: [{ model: models.Booking, order: [["date_in", "DESC"]] }],
+    });
+    if (!customer) return res.status(404).json({ success: false, message: "Customer not found" });
+    res.json({ success: true, data: customer });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
 module.exports = {
   getCustomers: getCustomers,
   createCustomer: createCustomer,
   updateCustomer: updateCustomer,
   deleteCustomer: deleteCustomer,
+  getCustomerBookingHistory: getCustomerBookingHistory,
 };

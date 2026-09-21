@@ -105,7 +105,7 @@ export default function Booking() {
                   {roomCategory.map((room) => (
                     <motion.div key={room.id} whileHover={{ y: -6 }} transition={{ type: "spring", stiffness: 300 }}>
                       <Card
-                        imgSrc={`/api/roomcategory/image/${room.image}`}
+                        imgSrc={`/uploads/${room.image}`}
                         imgAlt={room.category_name}
                         className="overflow-hidden shadow-md rounded-2xl h-full"
                       >

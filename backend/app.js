@@ -12,6 +12,9 @@ const bookedRoutes = require("./routes/booked.route");
 const detailsRoutes = require("./routes/details.route");
 const customerRoutes = require("./routes/customer.route");
 const bookingRoutes = require("./routes/booking.route");
+const paymentRoutes = require("./routes/payment.route");
+const feedbackRoutes = require("./routes/feedback.route");
+const auditRoutes = require("./routes/audit.route");
 
 const app = express();
 
@@ -39,6 +42,9 @@ app.use("/api/booked", bookedRoutes);
 app.use("/api/details", detailsRoutes);
 app.use("/api/customer", customerRoutes);
 app.use("/api/booking", bookingRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/feedback", feedbackRoutes);
+app.use("/api/audit", auditRoutes);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

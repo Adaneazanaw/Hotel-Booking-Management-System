@@ -6,8 +6,8 @@ services:
     container_name: mysql-db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: SalfordDB
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-change-me}
+      MYSQL_DATABASE: ${DB_NAME:-SalfordDB}
     volumes:
       - db_data:/var/lib/mysql
     ports:
@@ -21,9 +21,10 @@ services:
       - "3001:3001"
     environment:
       DB_HOST: mysql
-      DB_USER: root
-      DB_PASSWORD: 1234
-      DB_NAME: SalfordDB
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-change-me}
+      DB_NAME: ${DB_NAME:-SalfordDB}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-this-development-secret}
     depends_on:
       - mysql
     command: sh -c "npx sequelize-cli db:migrate && npm start"

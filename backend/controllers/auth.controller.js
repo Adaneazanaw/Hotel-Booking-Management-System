@@ -32,7 +32,7 @@ function signUp(req, res) {
                     phone: req.body.phone || null,
                     email: req.body.email,
                     password: hash,
-                    role: "admin",
+                    role: "receptionist",
                   };
 
                   models.User.create(user)
@@ -89,7 +89,7 @@ function signIn(req, res) {
               // Sign the token and set it to expire in 1 hour (3600 seconds)
               const token = jwt.sign(
                 { id: user.id, role: user.role },
-                process.env.JWT_SECRET_KEY,
+                process.env.JWT_SECRET_KEY || "development-only-secret",
                 { expiresIn: "1h" } // Token expires in 1 hour
               );
 
@@ -147,14 +147,14 @@ async function google(req, res, next) {
             firstname: firstName,
             lastname: lastName,
             profilepicurl: photoURL,
-            role: "admin",
+            role: "receptionist",
           };
 
           models.User.create(user)
             .then((result) => {
               const token = jwt.sign(
                 { id: result.id, role: result.role },
-                process.env.JWT_SECRET_KEY,
+                process.env.JWT_SECRET_KEY || "development-only-secret",
                 { expiresIn: "1h" }
               );
 
@@ -176,7 +176,7 @@ async function google(req, res, next) {
     } else {
       const token = jwt.sign(
         { id: user.id, role: user.role },
-        process.env.JWT_SECRET_KEY,
+        process.env.JWT_SECRET_KEY || "development-only-secret",
         { expiresIn: "1h" }
       );
 

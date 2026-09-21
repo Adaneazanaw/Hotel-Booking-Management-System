@@ -17,59 +17,49 @@ const CHECKED_DETAILS_QUERY = `
 `;
 
 // Check in a booking
-function checkIn(req, res) {
+async function checkIn(req, res) {
   const { booking_id } = req.body;
 
   if (!booking_id)
     return res.status(400).json({ success: false, message: "Booking ID is required." });
 
-  models.Booking.findByPk(booking_id)
-    .then((booking) => {
-      if (!booking)
-        return res.status(404).json({ success: false, message: "Booking not found." });
-
-      booking
-        .update({ status: "checked_in" })
-        .then(() => {
-          models.Room.update({ status: "occupied" }, { where: { id: booking.room_id } });
-          models.Checking.create({ booking_id, status: "checked_in" });
-          res.status(200).json({
-            success: true,
-            message: "Check-in completed successfully",
-          });
-        });
-    })
-    .catch((err) => {
-      res.status(400).json({ success: false, message: err.message });
+  try {
+    await models.sequelize.transaction(async (transaction) => {
+      const booking = await models.Booking.findByPk(booking_id, { transaction });
+      if (!booking) throw new Error("Booking not found.");
+      if (!["pending", "confirmed"].includes(booking.status)) throw new Error("Only confirmed bookings can be checked in.");
+      await booking.update({ status: "checked_in" }, { transaction });
+      await models.Room.update({ status: "occupied" }, { where: { id: booking.room_id }, transaction });
+      await models.Checking.create({ booking_id, status: "checked_in" }, { transaction });
+      await models.AuditLog.create({ event_type: "check_in", ref_no: booking.reference_number, room_id: booking.room_id, event_timestamp: new Date() }, { transaction });
     });
+    res.status(200).json({ success: true, message: "Check-in completed successfully" });
+  } catch (err) {
+    res.status(err.message === "Booking not found." ? 404 : 400).json({ success: false, message: err.message });
+  }
 }
 
 // Check out a booking
-function checkOut(req, res) {
+async function checkOut(req, res) {
   const { booking_id } = req.body;
 
   if (!booking_id)
     return res.status(400).json({ success: false, message: "Booking ID is required." });
 
-  models.Booking.findByPk(booking_id)
-    .then((booking) => {
-      if (!booking)
-        return res.status(404).json({ success: false, message: "Booking not found." });
-
-      booking
-        .update({ status: "checked_out" })
-        .then(() => {
-          models.Room.update({ status: "available" }, { where: { id: booking.room_id } });
-          models.Checking.create({ booking_id, status: "checked_out" });
-          res.status(200).json({
-            success: true,
-            message: "Check-out completed successfully",
-          });
-        });
-    })
-    .catch((err) => {
-      res.status(400).json({ success: false, message: err.message });
+  try {
+    await models.sequelize.transaction(async (transaction) => {
+      const booking = await models.Booking.findByPk(booking_id, { transaction });
+      if (!booking) throw new Error("Booking not found.");
+      if (booking.status !== "checked_in") throw new Error("Only checked-in bookings can be checked out.");
+      await booking.update({ status: "checked_out" }, { transaction });
+      await models.Room.update({ status: "available" }, { where: { id: booking.room_id }, transaction });
+      await models.Checking.create({ booking_id, status: "checked_out" }, { transaction });
+      await models.AuditLog.create({ event_type: "check_out", ref_no: booking.reference_number, room_id: booking.room_id, event_timestamp: new Date() }, { transaction });
     });
+    res.status(200).json({ success: true, message: "Check-out completed successfully" });
+  } catch (err) {
+    res.status(err.message === "Booking not found." ? 404 : 400).json({ success: false, message: err.message });
+  }
 }
 
 // Cancel a check-in (revert booking to confirmed, room to available)
