@@ -40,6 +40,16 @@ async function createBooking(req, res) {
       }
 
       const reference_number = `BK-${Date.now()}`;
+      await models.AuditLog.create(
+        {
+          event_type: "booking_created",
+          ref_no: reference_number,
+          room_id: Number(room_id),
+          event_timestamp: new Date(),
+        },
+        { transaction }
+      );
+
       const booking = await models.Booking.create(
         {
           reference_number,
@@ -53,15 +63,6 @@ async function createBooking(req, res) {
       );
 
       await room.update({ status: "occupied" }, { transaction });
-      await models.AuditLog.create(
-        {
-          event_type: "booking_created",
-          ref_no: reference_number,
-          room_id: Number(room_id),
-          event_timestamp: new Date(),
-        },
-        { transaction }
-      );
 
       return booking;
     });
@@ -98,13 +99,6 @@ async function editBooking(req, res) {
       }
 
       const oldRoomId = booking.room_id;
-      await booking.update({ room_id: Number(room_id), date_in: check_in, date_out: check_out }, { transaction });
-
-      if (Number(oldRoomId) !== Number(room_id)) {
-        await models.Room.update({ status: "available" }, { where: { id: oldRoomId }, transaction });
-        await room.update({ status: "occupied" }, { transaction });
-      }
-
       await models.AuditLog.create(
         {
           event_type: "booking_updated",
@@ -114,6 +108,13 @@ async function editBooking(req, res) {
         },
         { transaction }
       );
+
+      await booking.update({ room_id: Number(room_id), date_in: check_in, date_out: check_out }, { transaction });
+
+      if (Number(oldRoomId) !== Number(room_id)) {
+        await models.Room.update({ status: "available" }, { where: { id: oldRoomId }, transaction });
+        await room.update({ status: "occupied" }, { transaction });
+      }
     });
 
     res.status(200).json({ success: true, message: "Booking edited successfully" });
@@ -135,8 +136,6 @@ async function cancelBooking(req, res) {
       const booking = await models.Booking.findByPk(booking_id, { transaction });
       if (!booking) throw new Error("Booking not found");
 
-      await booking.update({ status: "cancelled" }, { transaction });
-      await models.Room.update({ status: "available" }, { where: { id: booking.room_id }, transaction });
       await models.AuditLog.create(
         {
           event_type: "booking_cancelled",
@@ -146,6 +145,9 @@ async function cancelBooking(req, res) {
         },
         { transaction }
       );
+
+      await booking.update({ status: "cancelled" }, { transaction });
+      await models.Room.update({ status: "available" }, { where: { id: booking.room_id }, transaction });
     });
 
     res.status(200).json({ success: true, message: "Booking cancelled successfully" });

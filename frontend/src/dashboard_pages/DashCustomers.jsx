@@ -25,6 +25,7 @@ import {
 import { MdDeleteForever } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { fetchJson } from "../utils/fetchJson";
 
 export default function DashCustomers() {
   const { currentUser } = useSelector((state) => state.user);
@@ -54,7 +55,7 @@ export default function DashCustomers() {
       const res = await fetch(`/api/customer/getcustomers`, {
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setCustomers(data.customers);
         setFetchLoading(false);
@@ -101,7 +102,7 @@ export default function DashCustomers() {
         },
         body: JSON.stringify(formData),
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setFormData({});
         fetchCustomer();
@@ -133,7 +134,7 @@ export default function DashCustomers() {
         method: "DELETE",
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         fetchCustomer();
         setShowDeleteConfirmation(false);
@@ -155,7 +156,7 @@ export default function DashCustomers() {
         },
         body: JSON.stringify(editFormData),
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         fetchCustomer();
         setUpdateLoading(false);

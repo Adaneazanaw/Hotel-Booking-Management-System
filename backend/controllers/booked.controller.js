@@ -36,10 +36,10 @@ async function checkIn(req, res) {
       const booking = await models.Booking.findByPk(booking_id, { transaction });
       if (!booking) throw new Error("Booking not found.");
       if (!["pending", "confirmed"].includes(booking.status)) throw new Error("Only confirmed bookings can be checked in.");
+      await models.AuditLog.create({ event_type: "check_in", ref_no: booking.reference_number, room_id: booking.room_id, event_timestamp: new Date() }, { transaction });
       await booking.update({ status: "checked_in" }, { transaction });
       await models.Room.update({ status: "occupied" }, { where: { id: booking.room_id }, transaction });
       await models.Checking.create({ booking_id, status: "checked_in" }, { transaction });
-      await models.AuditLog.create({ event_type: "check_in", ref_no: booking.reference_number, room_id: booking.room_id, event_timestamp: new Date() }, { transaction });
     });
     res.status(200).json({ success: true, message: "Check-in completed successfully" });
   } catch (err) {
@@ -59,10 +59,10 @@ async function checkOut(req, res) {
       const booking = await models.Booking.findByPk(booking_id, { transaction });
       if (!booking) throw new Error("Booking not found.");
       if (booking.status !== "checked_in") throw new Error("Only checked-in bookings can be checked out.");
+      await models.AuditLog.create({ event_type: "check_out", ref_no: booking.reference_number, room_id: booking.room_id, event_timestamp: new Date() }, { transaction });
       await booking.update({ status: "checked_out" }, { transaction });
       await models.Room.update({ status: "available" }, { where: { id: booking.room_id }, transaction });
       await models.Checking.create({ booking_id, status: "checked_out" }, { transaction });
-      await models.AuditLog.create({ event_type: "check_out", ref_no: booking.reference_number, room_id: booking.room_id, event_timestamp: new Date() }, { transaction });
     });
     res.status(200).json({ success: true, message: "Check-out completed successfully" });
   } catch (err) {

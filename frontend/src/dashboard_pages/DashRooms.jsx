@@ -25,10 +25,14 @@ import {
   HiOutlineExclamationCircle,
 } from "react-icons/hi";
 import { MdDeleteForever } from "react-icons/md";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { signoutSuccess } from "../redux/user/userSlice";
+import { fetchJson } from "../utils/fetchJson";
 
 export default function DashRooms() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
 
   const [formData, setFormData] = useState({
@@ -54,7 +58,7 @@ export default function DashRooms() {
     try {
       setFetchLoading(true);
       const res = await fetch(`/api/roomcategory/getroomcategories`);
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setRoomCategory(data.roomcategories);
         setFetchLoading(false);
@@ -71,7 +75,7 @@ export default function DashRooms() {
       const res = await fetch(`/api/room/getroom-all-details`, {
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setRoom(data.rooms);
         setFetchLoading(false);
@@ -138,7 +142,7 @@ export default function DashRooms() {
         }),
       });
 
-      const data = await res.json();
+      const data = await fetchJson(res);
 
       if (res.ok) {
         fetchRoom(); // Refresh the list after creation
@@ -149,6 +153,10 @@ export default function DashRooms() {
           status: "",
         }); // Clear the form after creation
         setCreateLoading(false);
+      } else if (res.status === 401) {
+        setCreateLoading(false);
+        dispatch(signoutSuccess());
+        navigate("/sign-in");
       } else {
         setCreateLoading(false);
         setShowAlert(true);
@@ -171,7 +179,7 @@ export default function DashRooms() {
         method: "DELETE",
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         fetchRoom(); // Refresh the list after deletion
         setShowDeleteConfirmation(false); // Close the modal
@@ -207,7 +215,7 @@ export default function DashRooms() {
         }),
       });
 
-      const data = await res.json();
+      const data = await fetchJson(res);
 
       if (res.ok) {
         fetchRoom(); // Refresh the list after creation
@@ -455,11 +463,17 @@ export default function DashRooms() {
                               <TableCell>
                                 <div className="flex items-center gap-4">
                                   <div className="w-28 h-16 relative">
-                                    <img
-                                      src={`http://localhost:3001/uploads/${room.category_image}`}
-                                      alt=""
-                                      className="w-full h-full object-cover rounded-lg"
-                                    />
+                                    {room.category_image ? (
+                                      <img
+                                        src={`/uploads/${room.category_image}`}
+                                        alt={`${room.category_name} room`}
+                                        className="w-full h-full object-cover rounded-lg"
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center rounded-lg bg-gray-100 text-xs text-gray-500">
+                                        No image
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </TableCell>

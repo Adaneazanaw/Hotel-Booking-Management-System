@@ -19,6 +19,7 @@ import {
 } from "react-icons/hi";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { fetchJson } from "../utils/fetchJson";
 
 export default function DashOverView() {
   const [fetchData, setFetchData] = useState(null); // Changed to null initially
@@ -137,7 +138,7 @@ export default function DashOverView() {
       const res = await fetch(`/api/booking/get-all-details`, {
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setBookedDetails(data.data);
         setFetchLoading(false);

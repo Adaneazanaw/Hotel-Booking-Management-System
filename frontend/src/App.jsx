@@ -12,21 +12,23 @@ import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import Booking from "./pages/Booking";
 import NotFound from "./pages/NotFound";
+import { fetchJson } from "./utils/fetchJson";
 
 export default function App() {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
+  const userId = currentUser?.id;
 
   useEffect(() => {
     document.title = "Galaxy Hotel Management System";
   }, []);
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!userId) return;
 
     fetch("/api/user/me", { credentials: "include" })
       .then(async (res) => {
-        const data = await res.json();
+        const data = await fetchJson(res);
         if (res.ok) {
           dispatch(signInSuccess(data));
         } else if (res.status === 401 || res.status === 404) {
@@ -36,7 +38,7 @@ export default function App() {
       .catch(() => {
         // Keep the persisted session when the API is temporarily unavailable.
       });
-  }, [currentUser, dispatch]);
+  }, [userId, dispatch]);
 
   return (
     <BrowserRouter>

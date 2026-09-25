@@ -22,6 +22,7 @@ import {
 } from "react-icons/hi";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { fetchJson } from "../utils/fetchJson";
 
 export default function DashBookingCancel() {
   const { currentUser } = useSelector((state) => state.user);
@@ -118,7 +119,7 @@ export default function DashBookingCancel() {
       const res = await fetch(`/api/booking/get-pending-details`, {
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setBookedDetails(data.data);
         setFetchLoading(false);
@@ -146,7 +147,7 @@ export default function DashBookingCancel() {
         method: "DELETE",
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setCreateLoading(false);
         setOpenModal(false);

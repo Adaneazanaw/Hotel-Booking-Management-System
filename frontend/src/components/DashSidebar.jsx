@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { signoutSuccess } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { fetchJson } from "../utils/fetchJson";
 
 // A plain nav link styled to match Flowbite sidebar items
 function NavItem({ to, icon: Icon, active, children, className = "" }) {
@@ -46,7 +47,7 @@ export default function DashSidebar() {
   const handleSignout = async () => {
     try {
       const res = await fetch("/api/auth/signout", { method: "POST", credentials: "include" });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (!res.ok) {
         console.log(data.message);
       } else {

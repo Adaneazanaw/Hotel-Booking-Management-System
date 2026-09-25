@@ -6,6 +6,7 @@ import { app } from "../firebase";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice";
 import { useNavigate } from "react-router-dom";
+import { fetchJson } from "../utils/fetchJson";
 
 export default function OAuth() {
   const auth = getAuth(app);
@@ -26,7 +27,7 @@ export default function OAuth() {
         }),
       });
       console.log(resultsFromGoogle.user);
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         dispatch(signInSuccess(data));
         navigate("/");

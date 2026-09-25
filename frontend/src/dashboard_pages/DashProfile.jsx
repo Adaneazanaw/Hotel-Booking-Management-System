@@ -32,6 +32,7 @@ import { HiOutlineExclamationCircle, HiHome } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiEye, HiEyeOff } from "react-icons/hi";
+import { fetchJson } from "../utils/fetchJson";
 
 export default function DashProfile() {
   const { currentUser, error, loading } = useSelector((state) => state.user);
@@ -137,7 +138,7 @@ export default function DashProfile() {
         },
         body: JSON.stringify(formData),
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (!res.ok) {
         dispatch(updateFailure(data.message));
         setUpdateUserError(data.message);

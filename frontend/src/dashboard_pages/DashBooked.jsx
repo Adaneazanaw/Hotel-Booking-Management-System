@@ -22,6 +22,7 @@ import { MdEditSquare } from "react-icons/md";
 import { HiHome, HiInformationCircle } from "react-icons/hi";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { fetchJson } from "../utils/fetchJson";
 
 export default function DashBooked() {
   const { currentUser } = useSelector((state) => state.user);
@@ -139,7 +140,7 @@ export default function DashBooked() {
     setFetchLoading(true);
     try {
       const res  = await fetch("/api/booking/get-all-details", { credentials: "include" });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) setBookedDetails(data.data);
       else showFlash(data.message, "failure");
     } catch (e) { console.error(e); }
@@ -149,7 +150,7 @@ export default function DashBooked() {
   const fetchCustomers = async () => {
     try {
       const res  = await fetch("/api/customer/getcustomers", { credentials: "include" });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) setCustomers(data.customers);
     } catch (e) { console.error(e); }
   };
@@ -157,7 +158,7 @@ export default function DashBooked() {
   const fetchRooms = async () => {
     try {
       const res  = await fetch("/api/room/getroom-all-details", { credentials: "include" });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) setRooms(data.rooms);
     } catch (e) { console.error(e); }
   };
@@ -207,7 +208,7 @@ export default function DashBooked() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(createForm),
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         closeModal();
         setCreateForm({ customer_id: "", room_id: "", check_in: "", check_out: "" });
@@ -236,7 +237,7 @@ export default function DashBooked() {
           check_out:  editForm.date_out,
         }),
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         closeModal();
         showFlash(data.message, "success");
@@ -257,7 +258,7 @@ export default function DashBooked() {
         method: "DELETE",
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         closeModal();
         showFlash(data.message, "success");

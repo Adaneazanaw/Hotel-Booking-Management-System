@@ -22,6 +22,7 @@ import { HiHome, HiInformationCircle, HiOutlineExclamationCircle } from "react-i
 import { MdDeleteForever } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { fetchJson } from "../utils/fetchJson";
 
 const MAX_SOURCE_IMAGE_SIZE = 100 * 1024 * 1024;
 const MAX_UPLOAD_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB — target after compression
@@ -96,7 +97,7 @@ export default function DashRoomCategorys() {
     try {
       setFetchLoading(true);
       const res = await fetch(`/api/roomcategory/getroomcategories`);
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setRoomCategory(data.roomcategories);
         setFetchLoading(false);
@@ -196,7 +197,7 @@ export default function DashRoomCategorys() {
         method: "POST",
         body: formDataToSend,
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         fetchRoomCategory();
         setFormData({
@@ -242,7 +243,7 @@ export default function DashRoomCategorys() {
           method: "DELETE",
         }
       );
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         fetchRoomCategory(); // Refresh the list after deletion
         setShowDeleteConfirmation(false); // Close the modal
@@ -282,7 +283,7 @@ export default function DashRoomCategorys() {
           body: formDataToSend,
         }
       );
-      const data = await res.json();
+      const data = await fetchJson(res);
 
       if (res.ok) {
         fetchRoomCategory(); // Refresh the list after updating

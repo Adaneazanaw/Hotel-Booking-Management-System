@@ -8,6 +8,7 @@ import { FaWifi, FaTv, FaSnowflake, FaCoffee } from "react-icons/fa";
 import FooterComponent from "../components/Footer";
 import image1 from "../assets/heroSlider/1.jpg";
 import image2 from "../assets/heroSlider/3.jpg";
+import { fetchJson } from "../utils/fetchJson";
 
 const roomAmenities = [
   { icon: <FaWifi />, label: "Free Wi-Fi" },
@@ -31,7 +32,7 @@ export default function Booking() {
     try {
       setFetchLoading(true);
       const res = await fetch(`/api/roomcategory/getroomcategories`);
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) setRoomCategory(data.roomcategories);
     } catch (error) {
       console.log(error.message);

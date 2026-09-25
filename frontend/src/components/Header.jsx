@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { signoutSuccess } from "../redux/user/userSlice";
 import brandImage from "../assets/heroSlider/1.jpg";
+import { fetchJson } from "../utils/fetchJson";
 
 export default function Header() {
   const path = useLocation().pathname;
@@ -21,7 +22,7 @@ export default function Header() {
   const handleSignout = async () => {
     try {
       const res = await fetch("/api/auth/signout", { method: "POST" });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (!res.ok) {
         console.log(data.message);
       } else {

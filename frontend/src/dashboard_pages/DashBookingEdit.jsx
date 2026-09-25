@@ -25,6 +25,7 @@ import {
 } from "react-icons/hi";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { fetchJson } from "../utils/fetchJson";
 
 export default function DashBookingEdit() {
   const { currentUser } = useSelector((state) => state.user);
@@ -134,7 +135,7 @@ export default function DashBookingEdit() {
       const res = await fetch(`/api/booking/get-pending-details`, {
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setBookedDetails(data.data);
         setFetchLoading(false);
@@ -159,7 +160,7 @@ export default function DashBookingEdit() {
       const res = await fetch(`/api/room/getroom-all-details`, {
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setRoom(data.rooms);
         setFetchLoading(false);
@@ -187,7 +188,7 @@ export default function DashBookingEdit() {
           room_id: formData.new_room_id,
         }),
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setCreateLoading(false);
         fetchBookedDetails();

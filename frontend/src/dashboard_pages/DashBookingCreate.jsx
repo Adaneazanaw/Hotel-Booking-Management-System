@@ -27,6 +27,7 @@ import {
 } from "react-icons/hi";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { fetchJson } from "../utils/fetchJson";
 
 export default function DashBookingCreate() {
   const { currentUser } = useSelector((state) => state.user);
@@ -54,7 +55,7 @@ export default function DashBookingCreate() {
       const res = await fetch(`/api/customer/getcustomers`, {
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setCustomer(data.customers);
         setFetchLoading(false);
@@ -71,7 +72,7 @@ export default function DashBookingCreate() {
       const res = await fetch(`/api/room/getroom-all-details`, {
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setRoom(data.rooms);
         setFetchLoading(false);
@@ -88,7 +89,7 @@ export default function DashBookingCreate() {
       const res = await fetch(`/api/booking/get-all-details`, {
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setBookingDetails(data.data);
         setFetchLoading(false);
@@ -175,7 +176,7 @@ export default function DashBookingCreate() {
         },
         body: JSON.stringify(formData),
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setCreateLoading(false);
         setFormData({

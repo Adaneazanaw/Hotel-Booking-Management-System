@@ -39,6 +39,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Profile from "../assets/add-pic.png";
 import { app } from "../firebase";
+import { fetchJson } from "../utils/fetchJson";
 export default function DashUser() {
   const { currentUser } = useSelector((state) => state.user);
   const [users, setUsers] = useState([]);
@@ -99,7 +100,7 @@ export default function DashUser() {
     try {
       setCreateLoading(true);
       const res = await fetch(`/api/user/getusers`);
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.ok) {
         setUsers(data.users);
         setCreateLoading(false);
@@ -113,7 +114,7 @@ export default function DashUser() {
   //   const startIndex = users.length;
   //   try {
   //     const res = await fetch(`/api/user/getusers?startIndex=${startIndex}`);
-  //     const data = await res.json();
+  //     const data = await fetchJson(res);
   //     if (res.ok) {
   //       setUsers((prev) => [...prev, ...data.users]);
   //       if (data.users.length < 9) {
@@ -204,7 +205,7 @@ export default function DashUser() {
         },
         body: JSON.stringify(formData),
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (!res.ok) {
         setCreateUserError(data.message);
         setCreateLoading(false);
@@ -233,7 +234,7 @@ export default function DashUser() {
         },
         body: JSON.stringify(formData),
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (!res.ok) {
         setCreateUserError(data.message);
         setCreateLoading(false);
@@ -262,7 +263,7 @@ export default function DashUser() {
       const res = await fetch(`/api/user/delete/${userIdToDelete}`, {
         method: "DELETE",
       });
-      const data = await res.json();
+      const data = await fetchJson(res);
       if (res.status == 400) {
         setShowModalDeletelock(true);
         setErrorMessage(data.message);
