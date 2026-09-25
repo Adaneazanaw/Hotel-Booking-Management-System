@@ -172,7 +172,9 @@ export default function DashBookingCancel() {
     } catch (error) {
       console.log(error.message);
       setCreateLoading(false);
-      setOpenModal(false);
+      setShowAlert(true);
+      setAlertColor("failure");
+      setAlertMessage(error.message || "Could not cancel booking. Please try again.");
     }
   };
 
@@ -210,6 +212,16 @@ export default function DashBookingCancel() {
               </Modal.Header>
 
               <Modal.Body>
+                {showAlert && (
+                  <Alert
+                    className="mb-4"
+                    color={alertColor}
+                    icon={HiInformationCircle}
+                    onDismiss={() => setShowAlert(false)}
+                  >
+                    {alertMessage}
+                  </Alert>
+                )}
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                   <div>
                     <Label value="Reference No : " />

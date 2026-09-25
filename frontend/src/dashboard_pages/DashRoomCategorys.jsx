@@ -23,6 +23,48 @@ import { MdDeleteForever } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
+const MAX_SOURCE_IMAGE_SIZE = 100 * 1024 * 1024;
+const MAX_UPLOAD_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB — target after compression
+
+async function compressRoomImage(file) {
+  const bitmap = await createImageBitmap(file);
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    bitmap.close();
+    throw new Error("Could not process this image in your browser.");
+  }
+
+  try {
+    let scale = Math.min(1, 1920 / Math.max(bitmap.width, bitmap.height));
+
+    for (let attempt = 0; attempt < 9; attempt += 1) {
+      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+      canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+
+      const quality = [0.82, 0.68, 0.54][attempt % 3];
+      const blob = await new Promise((resolve) =>
+        canvas.toBlob(resolve, "image/jpeg", quality)
+      );
+
+      if (blob && blob.size <= MAX_UPLOAD_IMAGE_SIZE) {
+        const filename = file.name.replace(/\.[^.]+$/, "") || "room-image";
+        return new File([blob], `${filename}.jpg`, { type: "image/jpeg" });
+      }
+
+      if (attempt % 3 === 2) scale *= 0.8;
+    }
+
+    throw new Error("Could not compress this image enough. Please choose a smaller image.");
+  } finally {
+    bitmap.close();
+  }
+}
+
 export default function DashRoomCategorys() {
   const { currentUser } = useSelector((state) => state.user);
 
@@ -85,6 +127,15 @@ export default function DashRoomCategorys() {
     const { id, value, files } = e.target;
     if (id === "dropzone-file" && files && files[0]) {
       const file = files[0];
+      if (file.size > MAX_SOURCE_IMAGE_SIZE) {
+        setShowAlert(true);
+        setAlertMessage("Image is too large. Maximum file size is 100 MB.");
+        setTimeout(() => {
+          setShowAlert(false);
+          setAlertMessage("");
+        }, 5000);
+        return;
+      }
       if (editedCategory) {
         setEditedCategory({ ...editedCategory, image: file });
       } else {
@@ -104,6 +155,15 @@ export default function DashRoomCategorys() {
   const handleDrop = (files) => {
     if (files && files[0]) {
       const file = files[0];
+      if (file.size > MAX_SOURCE_IMAGE_SIZE) {
+        setShowAlert(true);
+        setAlertMessage("Image is too large. Maximum file size is 100 MB.");
+        setTimeout(() => {
+          setShowAlert(false);
+          setAlertMessage("");
+        }, 5000);
+        return;
+      }
       if (editedCategory) {
         setEditedCategory({ ...editedCategory, image: file });
         setEditImagePreview(URL.createObjectURL(file)); // Set image preview for edit modal
@@ -128,7 +188,9 @@ export default function DashRoomCategorys() {
       formDataToSend.append("category_name", formData.category_name);
       formDataToSend.append("price", formData.price);
       formDataToSend.append("description", formData.description);
-      formDataToSend.append("image", formData.image);
+      if (formData.image) {
+        formDataToSend.append("image", await compressRoomImage(formData.image));
+      }
 
       const res = await fetch("/api/roomcategory/createroomcategory", {
         method: "POST",
@@ -162,6 +224,12 @@ export default function DashRoomCategorys() {
     } catch (error) {
       console.log(error.message);
       setCreateLoading(false);
+      setShowAlert(true);
+      setAlertMessage(error.message || "Could not upload this image.");
+      setTimeout(() => {
+        setShowAlert(false);
+        setAlertMessage("");
+      }, 5000);
     }
   };
 
@@ -203,7 +271,7 @@ export default function DashRoomCategorys() {
       formDataToSend.append("image", currentImage);
 
       if (editedCategory.image) {
-        formDataToSend.append("image", editedCategory.image);
+        formDataToSend.append("image", await compressRoomImage(editedCategory.image));
       }
 
 
@@ -237,6 +305,12 @@ export default function DashRoomCategorys() {
     } catch (error) {
       console.log(error.message);
       setUpdateLoading(false);
+      setShowAlert(true);
+      setAlertMessage(error.message || "Could not upload this image.");
+      setTimeout(() => {
+        setShowAlert(false);
+        setAlertMessage("");
+      }, 5000);
     }
   };
 
@@ -515,7 +589,7 @@ export default function DashRoomCategorys() {
                             or drag and drop
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            PNG or JPG (MAX. 800x400px)
+                            PNG or JPG (MAX. 25 MB)
                           </p>
                         </div>
                         <FileInput

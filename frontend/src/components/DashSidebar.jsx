@@ -1,49 +1,51 @@
 import { Sidebar } from "flowbite-react";
+import { HiChartPie } from "react-icons/hi";
 import {
-  HiUser,
-  HiArrowSmRight,
-  HiDocumentText,
-  HiOutlineUserGroup,
-  HiAnnotation,
-  HiChartPie,
-} from "react-icons/hi";
-import { FaUsers, FaPowerOff } from "react-icons/fa";
-import { RiHotelFill } from "react-icons/ri";
-import { FaBed } from "react-icons/fa6";
-
-import { FaSignInAlt, FaWindowClose, FaSignOutAlt } from "react-icons/fa";
-import { MdBedroomParent, MdEditSquare, MdBathroom } from "react-icons/md";
+  FaUsers, FaPowerOff, FaSignInAlt, FaWindowClose,
+  FaSignOutAlt, FaCalendarPlus, FaBed,
+} from "react-icons/fa";
+import { MdBedroomParent, MdEditSquare } from "react-icons/md";
 import { BiSolidCategory } from "react-icons/bi";
-import { IoIosMan, IoIosBed } from "react-icons/io";
+import { IoIosMan } from "react-icons/io";
+import { MdBathroom } from "react-icons/md";
 
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { signoutSuccess } from "../redux/user/userSlice";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+
+// A plain nav link styled to match Flowbite sidebar items
+function NavItem({ to, icon: Icon, active, children, className = "" }) {
+  return (
+    <Link
+      to={to}
+      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+        ${active
+          ? "bg-cyan-50 text-cyan-700 dark:bg-cyan-700 dark:text-white"
+          : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+        } ${className}`}
+    >
+      {Icon && <Icon className="h-5 w-5 shrink-0" />}
+      <span>{children}</span>
+    </Link>
+  );
+}
 
 export default function DashSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
-  const [tab, setTab] = useState("");
-
-  const bookingTabs = ["booked", "booking", "booking-create", "booking-edit", "booking-cancel"];
+  const [tab, setTab] = useState("dash");
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const tabFromUrl = urlParams.get("tab");
-    if (tabFromUrl) {
-      setTab(tabFromUrl);
-    }
+    const params = new URLSearchParams(location.search);
+    setTab(params.get("tab") || "dash");
   }, [location.search]);
 
   const handleSignout = async () => {
     try {
-      const res = await fetch("/api/auth/signout", {
-        method: "POST",
-        credentials: "include",
-      });
+      const res = await fetch("/api/auth/signout", { method: "POST", credentials: "include" });
       const data = await res.json();
       if (!res.ok) {
         console.log(data.message);
@@ -55,135 +57,101 @@ export default function DashSidebar() {
       console.log(error.message);
     }
   };
+
   return (
-    <Sidebar className="w-full md:w-56">
-      <Sidebar.Items>
-        <Sidebar.ItemGroup className="flex flex-col gap-1">
-          <Link to="/dashboard?tab=dash">
-            <Sidebar.Item
-              active={tab === "dash" || !tab}
-              icon={HiChartPie}
-              as="div"
-            >
-              Dashboard
-            </Sidebar.Item>
-          </Link>
+    <div className="w-full md:w-56 min-h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-3 flex flex-col gap-1">
 
-          <Sidebar.Item
-            active={bookingTabs.includes(tab)}
-            icon={FaBed}
-            href="/dashboard?tab=booked"
-          >
-            Booking
-          </Sidebar.Item>
+      {/* Dashboard */}
+      <NavItem to="/dashboard?tab=dash" icon={HiChartPie} active={tab === "dash"}>
+        Dashboard
+      </NavItem>
 
-          <Sidebar.Collapse
-            icon={FaBed}
-            label="Booking Actions"
-            open={true}
-          >
-            <Sidebar.Item
-              active={tab === "booked" || tab === "booking"}
-              icon={MdBathroom}
-              href="/dashboard?tab=booked"
-            >
-              All Booking
-            </Sidebar.Item>
+      {/* ── Booking section ── */}
+      <div className="mt-3 mb-1 px-2">
+        <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+          <FaBed />
+          Booking
+        </span>
+      </div>
 
-            <Sidebar.Item
-              active={tab === "booking-create"}
-              icon={IoIosBed}
-              href="/dashboard?tab=booking-create"
-            >
-              Booking Create
-            </Sidebar.Item>
+      <NavItem
+        to="/dashboard?tab=booked"
+        icon={MdBathroom}
+        active={tab === "booked" || tab === "booking"}
+        className="pl-5"
+      >
+        All Bookings
+      </NavItem>
 
-            <Sidebar.Item
-              active={tab === "booking-edit"}
-              icon={MdEditSquare}
-              href="/dashboard?tab=booking-edit"
-            >
-              Booking Edit
-            </Sidebar.Item>
+      <NavItem
+        to="/dashboard?tab=booking-create"
+        icon={FaCalendarPlus}
+        active={tab === "booking-create"}
+        className="pl-5"
+      >
+        Create Booking
+      </NavItem>
 
-            <Sidebar.Item
-              active={tab === "booking-cancel"}
-              icon={FaWindowClose}
-              href="/dashboard?tab=booking-cancel"
-            >
-              Booking Cancel
-            </Sidebar.Item>
-          </Sidebar.Collapse>
+      <NavItem
+        to="/dashboard?tab=booking-edit"
+        icon={MdEditSquare}
+        active={tab === "booking-edit"}
+        className="pl-5"
+      >
+        Edit Booking
+      </NavItem>
 
-          <Link to="/dashboard?tab=check-in">
-            <Sidebar.Item
-              active={tab === "check-in"}
-              icon={FaSignInAlt}
-              as="div"
-            >
-              Check In
-            </Sidebar.Item>
-          </Link>
+      <NavItem
+        to="/dashboard?tab=booking-cancel"
+        icon={FaWindowClose}
+        active={tab === "booking-cancel"}
+        className="pl-5"
+      >
+        Cancel Booking
+      </NavItem>
 
-          <Link to="/dashboard?tab=check-out">
-            <Sidebar.Item
-              active={tab === "check-out"}
-              icon={FaSignOutAlt}
-              as="div"
-            >
-              Check Out
-            </Sidebar.Item>
-          </Link>
+      {/* ── Other items ── */}
+      <div className="mt-2" />
 
-          <Link to="/dashboard?tab=customers">
-            <Sidebar.Item active={tab === "customers"} icon={IoIosMan} as="div">
-              Customers
-            </Sidebar.Item>
-          </Link>
+      <NavItem to="/dashboard?tab=check-in" icon={FaSignInAlt} active={tab === "check-in"}>
+        Check In
+      </NavItem>
 
-          <Link to="/dashboard?tab=rooms">
-            <Sidebar.Item
-              active={tab === "rooms"}
-              icon={MdBedroomParent}
-              as="div"
-            >
-              Rooms
-            </Sidebar.Item>
-          </Link>
+      <NavItem to="/dashboard?tab=check-out" icon={FaSignOutAlt} active={tab === "check-out"}>
+        Check Out
+      </NavItem>
 
-          <Link to="/dashboard?tab=reports">
-            <Sidebar.Item active={tab === "reports"} icon={HiChartPie} as="div">
-              Reports
-            </Sidebar.Item>
-          </Link>
+      <NavItem to="/dashboard?tab=customers" icon={IoIosMan} active={tab === "customers"}>
+        Customers
+      </NavItem>
 
-          <Link to="/dashboard?tab=room-category">
-            <Sidebar.Item
-              active={tab === "room-category" || !tab}
-              icon={BiSolidCategory}
-              as="div"
-            >
-              Room Category
-            </Sidebar.Item>
-          </Link>
+      <NavItem to="/dashboard?tab=rooms" icon={MdBedroomParent} active={tab === "rooms"}>
+        Rooms
+      </NavItem>
 
-          {currentUser?.role === "admin" && (
-            <Link to="/dashboard?tab=users">
-              <Sidebar.Item active={tab === "users"} icon={FaUsers} as="div">
-                Users
-              </Sidebar.Item>
-            </Link>
-          )}
+      <NavItem to="/dashboard?tab=room-category" icon={BiSolidCategory} active={tab === "room-category"}>
+        Room Category
+      </NavItem>
 
-          <Sidebar.Item
-            icon={FaPowerOff}
-            className="cursor-pointer"
-            onClick={handleSignout}
-          >
-            Sign Out
-          </Sidebar.Item>
-        </Sidebar.ItemGroup>
-      </Sidebar.Items>
-    </Sidebar>
+      <NavItem to="/dashboard?tab=reports" icon={HiChartPie} active={tab === "reports"}>
+        Reports
+      </NavItem>
+
+      {currentUser?.role === "admin" && (
+        <NavItem to="/dashboard?tab=users" icon={FaUsers} active={tab === "users"}>
+          Users
+        </NavItem>
+      )}
+
+      {/* Sign Out */}
+      <button
+        onClick={handleSignout}
+        className="mt-auto flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 transition-colors"
+      >
+        <FaPowerOff className="h-5 w-5 shrink-0" />
+        <span>Sign Out</span>
+      </button>
+
+    </div>
   );
 }

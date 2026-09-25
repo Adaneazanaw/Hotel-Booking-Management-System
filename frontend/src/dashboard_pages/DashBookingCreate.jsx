@@ -203,6 +203,9 @@ export default function DashBookingCreate() {
     } catch (error) {
       console.log(error.message);
       setCreateLoading(false);
+      setShowAlert(true);
+      setAlertColor("failure");
+      setAlertMessage(error.message || "Could not create booking. Please try again.");
     }
   };
 

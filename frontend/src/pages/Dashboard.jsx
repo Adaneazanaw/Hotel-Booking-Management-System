@@ -47,16 +47,10 @@ export default function Dashboard() {
       {tab === "check-in" && <DashCheckIn />}
       {/* check out */}
       {tab === "check-out" && <DashCheckOut />}
-      {/* booked */}
-      {(tab === "booked" || tab === "booking") && <DashBooked />}
-      {/* booking cancel */}
-      {tab === "booking-cancel" && <DashBookingCancel />}
-      {/* booking edit */}
-      {tab === "booking-edit" && <DashBookingEdit />}
+      {/* booked — all booking actions (create, edit, cancel) live here */}
+      {(tab === "booked" || tab === "booking" || tab === "booking-create" || tab === "booking-edit" || tab === "booking-cancel") && <DashBooked />}
       {/* overview */}
       {tab === "dash" && <DashOverView />}
-      {/* booking create */}
-      {tab === "booking-create" && <DashBookingCreate />}
       {tab === "reports" && <DashReports />}
     </div>
   );

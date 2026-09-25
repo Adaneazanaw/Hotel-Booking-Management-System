@@ -43,6 +43,7 @@ export default function DashBookingEdit() {
   const [fetchLoading, setFetchLoading] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [alertColor, setAlertColor] = useState("failure");
   const [openModal, setOpenModal] = useState(false);
 
   const [bookedCheckOut, setBookedCheckOut] = useState([]);
@@ -192,6 +193,7 @@ export default function DashBookingEdit() {
         fetchBookedDetails();
         setOpenModal(false);
         setShowAlert(true);
+        setAlertColor("success");
         setAlertMessage(data.message);
         setTimeout(() => {
           setShowAlert(false);
@@ -201,6 +203,7 @@ export default function DashBookingEdit() {
       } else {
         setCreateLoading(false);
         setShowAlert(true);
+        setAlertColor("failure");
         setAlertMessage(data.message);
         setTimeout(() => {
           setShowAlert(false);
@@ -210,6 +213,9 @@ export default function DashBookingEdit() {
     } catch (error) {
       console.log(error.message);
       setCreateLoading(false);
+      setShowAlert(true);
+      setAlertColor("failure");
+      setAlertMessage(error.message || "Could not edit booking. Please try again.");
     }
   };
 
@@ -252,6 +258,17 @@ export default function DashBookingEdit() {
             <Breadcrumb.Item>Edit</Breadcrumb.Item>
           </Breadcrumb>
 
+          {showAlert && (
+            <Alert
+              className="mt-3"
+              color={alertColor}
+              icon={HiInformationCircle}
+              onDismiss={() => setShowAlert(false)}
+            >
+              {alertMessage}
+            </Alert>
+          )}
+
           <Modal
             show={openModal}
             onClose={() => setOpenModal(false)}
@@ -268,6 +285,16 @@ export default function DashBookingEdit() {
               </Modal.Header>
 
               <Modal.Body>
+                {showAlert && (
+                  <Alert
+                    className="mb-4"
+                    color={alertColor}
+                    icon={HiInformationCircle}
+                    onDismiss={() => setShowAlert(false)}
+                  >
+                    {alertMessage}
+                  </Alert>
+                )}
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                   <div className="flex gap-10">
                     <div className="flex flex-col gap-5 ">

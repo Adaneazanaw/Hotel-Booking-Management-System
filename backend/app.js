@@ -47,8 +47,11 @@ app.use("/api/feedback", feedbackRoutes);
 app.use("/api/audit", auditRoutes);
 
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
+  const isFileTooLarge = err.code === "LIMIT_FILE_SIZE";
+  const statusCode = isFileTooLarge ? 413 : err.statusCode || 500;
+  const message = isFileTooLarge
+    ? "Image is too large. Maximum file size is 25 MB."
+    : err.message || "Internal Server Error";
   res.status(statusCode).json({
     success: false,
     statusCode,

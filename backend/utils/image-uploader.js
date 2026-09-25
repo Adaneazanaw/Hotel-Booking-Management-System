@@ -34,7 +34,7 @@ const getUploader = (folder) =>
   multer({
     storage: dynamicStorage(folder),
     limits: {
-      fileSize: 1024 * 1024 * 2,
+      fileSize: 25 * 1024 * 1024, // 25 MB
     },
     fileFilter: fileFilter,
   });
