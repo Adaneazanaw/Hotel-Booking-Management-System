@@ -51,7 +51,9 @@ export default function DashCustomers() {
   const fetchCustomer = async () => {
     try {
       setFetchLoading(true);
-      const res = await fetch(`/api/customer/getcustomers`);
+      const res = await fetch(`/api/customer/getcustomers`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (res.ok) {
         setCustomers(data.customers);
@@ -93,6 +95,7 @@ export default function DashCustomers() {
       setCreateLoading(true);
       const res = await fetch("/api/customer/create", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -128,6 +131,7 @@ export default function DashCustomers() {
     try {
       const res = await fetch(`/api/customer/delete/${userIdToDelete}`, {
         method: "DELETE",
+        credentials: "include",
       });
       const data = await res.json();
       if (res.ok) {
@@ -145,6 +149,7 @@ export default function DashCustomers() {
       setUpdateLoading(true);
       const res = await fetch(`/api/customer/update/${editFormData.id}`, {
         method: "PUT",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },

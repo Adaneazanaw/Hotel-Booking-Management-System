@@ -114,7 +114,9 @@ export default function DashCheckOut() {
   const fetchBookedDetails = async () => {
     try {
       setFetchLoading(true);
-      const res = await fetch(`/api/booking/get-checked-in-details`);
+      const res = await fetch(`/api/booking/get-checked-in-details`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (res.ok) {
         setBookedDetails(data.data);
@@ -141,6 +143,7 @@ export default function DashCheckOut() {
     try {
       const res = await fetch(`/api/booked/checkout`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },

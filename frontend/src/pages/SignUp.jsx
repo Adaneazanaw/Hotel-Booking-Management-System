@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BsPersonPlus } from "react-icons/bs";
 import image1 from "../assets/heroSlider/1.jpg";
+import brandImage from "../assets/heroSlider/1.jpg";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
@@ -30,17 +31,16 @@ export default function SignUp() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      if (data.success === false) {
-        setLoading(false);
-        return setErrorMessage(data.message);
+      if (!res.ok || data.success === false) {
+        return setErrorMessage(
+          data.message || "Unable to create the account. Please try again."
+        );
       }
-      setLoading(false);
-      if (res.ok) {
-        setSuccessMessage("Account created successfully! Redirecting to sign in...");
-        setTimeout(() => navigate("/sign-in"), 2000);
-      }
+      setSuccessMessage("Account created successfully! Redirecting to sign in...");
+      setTimeout(() => navigate("/sign-in"), 2000);
     } catch (error) {
       setErrorMessage(error.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -54,10 +54,13 @@ export default function SignUp() {
       >
         <div className="absolute inset-0 bg-customBlue bg-opacity-80 flex flex-col justify-end p-12">
           <Link to="/">
-            <span className="text-white font-bold text-xl tracking-wide mb-8 inline-block">🏨 Adane Grand Hotel</span>
+            <span className="flex items-center gap-2 text-white font-bold text-xl tracking-wide mb-8">
+              <img src={brandImage} alt="Galaxy Hotel" className="w-9 h-9 rounded-full object-cover" />
+              Galaxy Hotel
+            </span>
           </Link>
           <p className="text-gray-300 text-sm leading-relaxed max-w-sm">
-            Create your account to access the Adane Grand Hotel management
+            Create your account to access the Galaxy Hotel management
             system and start managing bookings effortlessly.
           </p>
           <div className="mt-8 flex items-center gap-3">
@@ -78,7 +81,10 @@ export default function SignUp() {
           className="w-full max-w-md"
         >
           <Link to="/" className="flex justify-center mb-8 md:hidden">
-            <span className="text-customBlue font-bold text-xl">🏨 Adane Grand Hotel</span>
+            <span className="flex items-center gap-2 text-customBlue font-bold text-xl">
+              <img src={brandImage} alt="Galaxy Hotel" className="w-9 h-9 rounded-full object-cover" />
+              Galaxy Hotel
+            </span>
           </Link>
 
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-1">
@@ -134,7 +140,7 @@ export default function SignUp() {
           {errorMessage && <Alert className="mt-5" color="failure">{errorMessage}</Alert>}
 
           <p className="text-center text-xs text-gray-400 mt-8">
-            © {new Date().getFullYear()} Adane Grand Hotel. All rights reserved.
+            © {new Date().getFullYear()} Galaxy Hotel. All rights reserved.
           </p>
         </motion.div>
       </div>

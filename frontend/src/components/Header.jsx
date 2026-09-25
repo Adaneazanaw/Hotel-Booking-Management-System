@@ -1,11 +1,13 @@
 import { Button, Navbar, Dropdown, Avatar } from "flowbite-react";
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { signoutSuccess } from "../redux/user/userSlice";
+import brandImage from "../assets/heroSlider/1.jpg";
 
 export default function Header() {
   const path = useLocation().pathname;
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
   const [scrolled, setScrolled] = useState(false);
@@ -24,6 +26,7 @@ export default function Header() {
         console.log(data.message);
       } else {
         dispatch(signoutSuccess());
+        navigate("/sign-in");
       }
     } catch (error) {
       console.log(error.message);
@@ -45,7 +48,10 @@ export default function Header() {
       fluid
     >
       <Link to="/">
-        <span className="text-customBlue font-bold text-lg tracking-wide">🏨 Adane Grand Hotel</span>
+        <span className="flex items-center gap-2 text-customBlue font-bold text-lg tracking-wide">
+          <img src={brandImage} alt="Galaxy Hotel" className="w-8 h-8 rounded-full object-cover" />
+          Galaxy Hotel
+        </span>
       </Link>
 
       <div className="flex items-center gap-2 md:order-2">

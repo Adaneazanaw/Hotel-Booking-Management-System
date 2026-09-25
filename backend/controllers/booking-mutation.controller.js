@@ -35,7 +35,7 @@ async function createBooking(req, res) {
 
       if (!room) throw new Error("Room not found");
       if (!customer) throw new Error("Customer not found");
-      if (room.status !== "available") {
+      if (room.status.toLowerCase() !== "available") {
         throw new Error(`Room "${room.room_name}" is currently ${room.status}`);
       }
 
@@ -43,8 +43,8 @@ async function createBooking(req, res) {
       const booking = await models.Booking.create(
         {
           reference_number,
-          room_id,
-          customer_id,
+          room_id: Number(room_id),
+          customer_id: Number(customer_id),
           date_in: check_in,
           date_out: check_out,
           status: "confirmed",
@@ -57,7 +57,7 @@ async function createBooking(req, res) {
         {
           event_type: "booking_created",
           ref_no: reference_number,
-          room_id,
+          room_id: Number(room_id),
           event_timestamp: new Date(),
         },
         { transaction }
@@ -93,14 +93,14 @@ async function editBooking(req, res) {
 
       if (!booking) throw new Error("Booking not found");
       if (!room) throw new Error("Room not found");
-      if (room_id !== booking.room_id && room.status !== "available") {
+      if (Number(room_id) !== Number(booking.room_id) && room.status.toLowerCase() !== "available") {
         throw new Error(`Room "${room.room_name}" is currently ${room.status}`);
       }
 
       const oldRoomId = booking.room_id;
-      await booking.update({ room_id, date_in: check_in, date_out: check_out }, { transaction });
+      await booking.update({ room_id: Number(room_id), date_in: check_in, date_out: check_out }, { transaction });
 
-      if (oldRoomId !== room_id) {
+      if (Number(oldRoomId) !== Number(room_id)) {
         await models.Room.update({ status: "available" }, { where: { id: oldRoomId }, transaction });
         await room.update({ status: "occupied" }, { transaction });
       }
@@ -109,7 +109,7 @@ async function editBooking(req, res) {
         {
           event_type: "booking_updated",
           ref_no: booking.reference_number,
-          room_id,
+          room_id: Number(room_id),
           event_timestamp: new Date(),
         },
         { transaction }

@@ -27,6 +27,9 @@ export default function DashSidebar() {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
   const [tab, setTab] = useState("");
+
+  const bookingTabs = ["booked", "booking", "booking-create", "booking-edit", "booking-cancel"];
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const tabFromUrl = urlParams.get("tab");
@@ -34,16 +37,19 @@ export default function DashSidebar() {
       setTab(tabFromUrl);
     }
   }, [location.search]);
+
   const handleSignout = async () => {
     try {
       const res = await fetch("/api/auth/signout", {
         method: "POST",
+        credentials: "include",
       });
       const data = await res.json();
       if (!res.ok) {
         console.log(data.message);
       } else {
         dispatch(signoutSuccess());
+        navigate("/sign-in");
       }
     } catch (error) {
       console.log(error.message);
@@ -63,45 +69,50 @@ export default function DashSidebar() {
             </Sidebar.Item>
           </Link>
 
-          <Sidebar.Collapse icon={FaBed} label="Booking">
-            <Link to="/dashboard?tab=booked">
-              <Sidebar.Item
-                  active={tab === "booked"}
-                icon={MdBathroom}
-                as="div"
-              >
-                All Booking
-              </Sidebar.Item>
-            </Link>
+          <Sidebar.Item
+            active={bookingTabs.includes(tab)}
+            icon={FaBed}
+            href="/dashboard?tab=booked"
+          >
+            Booking
+          </Sidebar.Item>
 
-            <Link to="/dashboard?tab=booking-create">
-              <Sidebar.Item
-                active={tab === "booking-create"}
-                icon={IoIosBed}
-                as="div"
-              >
-                Booking Create
-              </Sidebar.Item>
-            </Link>
-            <Link to="/dashboard?tab=booking-edit">
-              <Sidebar.Item
-                active={tab === "booking-edit"}
-                icon={MdEditSquare}
-                as="div"
-              >
-                Booking Edit
-              </Sidebar.Item>
-            </Link>
+          <Sidebar.Collapse
+            icon={FaBed}
+            label="Booking Actions"
+            open={true}
+          >
+            <Sidebar.Item
+              active={tab === "booked" || tab === "booking"}
+              icon={MdBathroom}
+              href="/dashboard?tab=booked"
+            >
+              All Booking
+            </Sidebar.Item>
 
-            <Link to="/dashboard?tab=booking-cancel">
-              <Sidebar.Item
-                active={tab === "booking-cancel"}
-                icon={FaWindowClose}
-                as="div"
-              >
-                Booking Cancel
-              </Sidebar.Item>
-            </Link>
+            <Sidebar.Item
+              active={tab === "booking-create"}
+              icon={IoIosBed}
+              href="/dashboard?tab=booking-create"
+            >
+              Booking Create
+            </Sidebar.Item>
+
+            <Sidebar.Item
+              active={tab === "booking-edit"}
+              icon={MdEditSquare}
+              href="/dashboard?tab=booking-edit"
+            >
+              Booking Edit
+            </Sidebar.Item>
+
+            <Sidebar.Item
+              active={tab === "booking-cancel"}
+              icon={FaWindowClose}
+              href="/dashboard?tab=booking-cancel"
+            >
+              Booking Cancel
+            </Sidebar.Item>
           </Sidebar.Collapse>
 
           <Link to="/dashboard?tab=check-in">

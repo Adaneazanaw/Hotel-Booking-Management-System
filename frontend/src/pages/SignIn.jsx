@@ -10,6 +10,7 @@ import {
 import { motion } from "framer-motion";
 import { BsShieldLock } from "react-icons/bs";
 import image1 from "../assets/heroSlider/2.jpg";
+import brandImage from "../assets/heroSlider/1.jpg";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
@@ -30,17 +31,18 @@ export default function SignIn() {
       dispatch(signInStart());
       const res = await fetch("/api/auth/signin", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      if (data.success === false) {
-        dispatch(signInFailure(data.message));
+      if (!res.ok || data.success === false) {
+        return dispatch(
+          signInFailure(data.message || "Unable to sign in. Please try again.")
+        );
       }
-      if (res.ok) {
-        dispatch(signInSuccess(data));
-        navigate("/");
-      }
+      dispatch(signInSuccess(data));
+      navigate("/");
     } catch (error) {
       dispatch(signInFailure(error.message));
     }
@@ -55,10 +57,13 @@ export default function SignIn() {
       >
         <div className="absolute inset-0 bg-customBlue bg-opacity-80 flex flex-col justify-end p-12">
           <Link to="/">
-            <span className="text-white font-bold text-xl tracking-wide mb-8 inline-block">🏨 Adane Grand Hotel</span>
+            <span className="flex items-center gap-2 text-white font-bold text-xl tracking-wide mb-8">
+              <img src={brandImage} alt="Galaxy Hotel" className="w-9 h-9 rounded-full object-cover" />
+              Galaxy Hotel
+            </span>
           </Link>
           <p className="text-gray-300 text-sm leading-relaxed max-w-sm">
-            Sign in to access the Adane Grand Hotel management dashboard and
+            Sign in to access the Galaxy Hotel management dashboard and
             manage bookings, rooms, customers, and more.
           </p>
           <div className="mt-8 flex items-center gap-3">
@@ -79,7 +84,10 @@ export default function SignIn() {
           className="w-full max-w-md"
         >
           <Link to="/" className="flex justify-center mb-8 md:hidden">
-            <span className="text-customBlue font-bold text-xl">🏨 Adane Grand Hotel</span>
+            <span className="flex items-center gap-2 text-customBlue font-bold text-xl">
+              <img src={brandImage} alt="Galaxy Hotel" className="w-9 h-9 rounded-full object-cover" />
+              Galaxy Hotel
+            </span>
           </Link>
 
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-1">
@@ -91,14 +99,6 @@ export default function SignIn() {
               Create one
             </Link>
           </p>
-
-          <Alert color="info" className="mb-6">
-            <span className="font-semibold">Demo credentials — </span>
-            Username:{" "}
-            <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">admin</code>
-            {" "}| Password:{" "}
-            <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">admin</code>
-          </Alert>
 
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             <div>
@@ -136,7 +136,7 @@ export default function SignIn() {
           )}
 
           <p className="text-center text-xs text-gray-400 mt-8">
-            © {new Date().getFullYear()} Adane Grand Hotel. All rights reserved.
+            © {new Date().getFullYear()} Galaxy Hotel. All rights reserved.
           </p>
         </motion.div>
       </div>

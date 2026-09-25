@@ -9,7 +9,7 @@
   },
   "production": {
     "username": "root",
-    "password": "1234",
+    "password": "SEE_ENV_DB_PASSWORD",
     "database": "AdaneGrandDB",
     "host": "mysql",
     "dialect": "mysql"

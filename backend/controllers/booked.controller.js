@@ -1,6 +1,13 @@
 const models = require("../models");
 
-const CHECKED_DETAILS_QUERY = `
+// total_price uses a dialect-safe day-difference expression (SQLite vs MySQL)
+function buildCheckedDetailsQuery(dialect) {
+  const dayDiff =
+    dialect === "mysql"
+      ? "GREATEST(1, DATEDIFF(b.date_out, b.date_in))"
+      : "MAX(1, CAST(ROUND(julianday(b.date_out) - julianday(b.date_in)) AS INTEGER))";
+
+  return `
   SELECT b.id, b.id as booking_id, b.reference_number, b.room_id, b.customer_id,
          b.date_in, b.date_out, b.status as booking_status,
          b.createdAt, b.updatedAt,
@@ -8,13 +15,14 @@ const CHECKED_DETAILS_QUERY = `
          c.contact_no as customer_phone,
          r.room_name, r.category_id, r.status as room_status,
          rc.category_name as room_category_name, rc.price,
-         (julianday(b.date_out) - julianday(b.date_in)) * rc.price as total_price
+         ${dayDiff} * rc.price as total_price
   FROM Bookings b
   LEFT JOIN Customers c ON b.customer_id = c.id
   LEFT JOIN Rooms r ON b.room_id = r.id
   LEFT JOIN RoomCategories rc ON r.category_id = rc.id
   WHERE b.deletedAt IS NULL
 `;
+}
 
 // Check in a booking
 async function checkIn(req, res) {
@@ -143,9 +151,10 @@ async function editCheckIn(req, res) {
 
 // Get all checked-in details
 function getAllDetailsChecked(req, res) {
+  const query = buildCheckedDetailsQuery(models.sequelize.getDialect());
   models.sequelize
     .query(
-      CHECKED_DETAILS_QUERY +
+      query +
         " AND b.status IN ('checked_in', 'checked_out') ORDER BY b.createdAt DESC",
       { type: models.sequelize.QueryTypes.SELECT }
     )
@@ -163,9 +172,10 @@ function getAllDetailsChecked(req, res) {
 
 // Get all checked-out details
 function getAllDetailsCheckedOut(req, res) {
+  const query = buildCheckedDetailsQuery(models.sequelize.getDialect());
   models.sequelize
     .query(
-      CHECKED_DETAILS_QUERY +
+      query +
         " AND b.status = 'checked_out' ORDER BY b.createdAt DESC",
       { type: models.sequelize.QueryTypes.SELECT }
     )

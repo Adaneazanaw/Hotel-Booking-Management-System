@@ -1,4 +1,27 @@
 const models = require("../models");
+const bcrypt = require("bcrypt");
+
+function getCurrentUser(req, res) {
+  models.User.findByPk(req.user.id, {
+    attributes: { exclude: ["password"] },
+  })
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      res.status(200).json(user);
+    })
+    .catch((err) => {
+      res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    });
+}
 
 function getUsers(req, res) {
   models.User.findAll()
@@ -52,6 +75,75 @@ function createUser(req, res) {
     });
 }
 
+function updateUser(req, res) {
+  const { id } = req.params;
+
+  if (
+    !req.user ||
+    (Number(req.user.id) !== Number(id) &&
+      !["admin", "manager"].includes(req.user.role))
+  ) {
+    return res.status(403).json({
+      success: false,
+      message: "You do not have permission to perform this action",
+    });
+  }
+
+  const allowedFields = [
+    "username",
+    "firstname",
+    "lastname",
+    "phone",
+    "email",
+    "role",
+    "profilepicurl",
+    "password",
+  ];
+
+  const updates = {};
+
+  allowedFields.forEach((field) => {
+    if (req.body[field] !== undefined && req.body[field] !== null) {
+      updates[field] = req.body[field];
+    }
+  });
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: "No fields to update",
+    });
+  }
+
+  if (updates.password) {
+    const saltRounds = 10;
+    updates.password = bcrypt.hashSync(updates.password, saltRounds);
+  }
+
+  return models.User.findByPk(id)
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      return user.update(updates).then((updatedUser) => {
+        res.status(200).json({
+          success: true,
+          user: updatedUser,
+        });
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    });
+}
+
 function deleteUser(req, res) {
   const { id } = req.params;
 
@@ -98,8 +190,10 @@ function getCustomers(req, res) {
 }
 
 module.exports = {
+  getCurrentUser: getCurrentUser,
   getUsers: getUsers,
   createUser: createUser,
+  updateUser: updateUser,
   deleteUser: deleteUser,
   getCustomers: getCustomers,
 };

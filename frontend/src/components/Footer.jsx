@@ -9,6 +9,7 @@ import {
   BsPhone,
   BsMailbox,
 } from "react-icons/bs";
+import brandImage from "../assets/heroSlider/1.jpg";
 export default function FooterComponent() {
   const currentYear = new Date().getFullYear();
 
@@ -20,12 +21,13 @@ export default function FooterComponent() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/">
-              <span className="text-white text-xl font-bold tracking-wide mb-4 inline-block">
-                🏨 Adane Grand Hotel
+              <span className="flex items-center gap-2 text-white text-xl font-bold tracking-wide mb-4">
+                <img src={brandImage} alt="Galaxy Hotel" className="w-9 h-9 rounded-full object-cover" />
+                Galaxy Hotel
               </span>
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed mb-6">
-              Adane Grand Hotel is a luxury destination offering unparalleled
+              Galaxy Hotel is a luxury destination offering unparalleled
               comfort, world-class service, and unforgettable experiences in
               the heart of the city.
             </p>
@@ -103,8 +105,8 @@ export default function FooterComponent() {
               </li>
               <li className="flex items-center gap-3 text-sm text-gray-400">
                 <BsPhone className="text-yellow-400 shrink-0" />
-                <a href="tel:+11234567890" className="hover:text-white transition-colors">
-                  +1 (123) 456-7890
+                <a href="tel:+251974088153" className="hover:text-white transition-colors">
+                  +251 974088153
                 </a>
               </li>
               <li className="flex items-center gap-3 text-sm text-gray-400">
@@ -121,7 +123,7 @@ export default function FooterComponent() {
       {/* Bottom Bar */}
       <div className="border-t border-gray-700">
         <div className="container mx-auto px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
-          <p>© {currentYear} Adane Grand Hotel. All rights reserved.</p>
+          <p>© {currentYear} Galaxy Hotel. All rights reserved.</p>
           <div className="flex gap-5">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms &amp; Conditions</a>

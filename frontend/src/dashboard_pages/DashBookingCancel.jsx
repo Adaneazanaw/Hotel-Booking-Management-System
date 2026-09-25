@@ -39,6 +39,7 @@ export default function DashBookingCancel() {
   const [fetchLoading, setFetchLoading] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [alertColor, setAlertColor] = useState("failure");
   const [openModal, setOpenModal] = useState(false);
 
   const [bookedCheckOut, setBookedCheckOut] = useState([]);
@@ -114,7 +115,9 @@ export default function DashBookingCancel() {
   const fetchBookedDetails = async () => {
     try {
       setFetchLoading(true);
-      const res = await fetch(`/api/booking/get-pending-details`);
+      const res = await fetch(`/api/booking/get-pending-details`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (res.ok) {
         setBookedDetails(data.data);
@@ -122,6 +125,7 @@ export default function DashBookingCancel() {
       } else {
         setFetchLoading(false);
         setShowAlert(true);
+        setAlertColor("failure");
         setAlertMessage(data.message);
         setTimeout(() => {
           setShowAlert(false);
@@ -140,6 +144,7 @@ export default function DashBookingCancel() {
       setCreateLoading(true);
       const res = await fetch(`/api/booking/cancel/${selectedBookingId}`, {
         method: "DELETE",
+        credentials: "include",
       });
       const data = await res.json();
       if (res.ok) {
@@ -147,6 +152,7 @@ export default function DashBookingCancel() {
         setOpenModal(false);
         fetchBookedDetails();
         setShowAlert(true);
+        setAlertColor("success");
         setAlertMessage(data.message);
         setTimeout(() => {
           setShowAlert(false);
@@ -156,6 +162,7 @@ export default function DashBookingCancel() {
         setCreateLoading(false);
         setOpenModal(false);
         setShowAlert(true);
+        setAlertColor("failure");
         setAlertMessage(data.message);
         setTimeout(() => {
           setShowAlert(false);
@@ -257,17 +264,17 @@ export default function DashBookingCancel() {
                     <Label value="Status : " />
 
                     <div className="w-28">
-                      {bookedCheckOut.status_description === "Checked Out" ? (
+                      {bookedCheckOut.booking_status === "checked_out" ? (
                         <Badge color="success" size="lg">
                           Checked Out
                         </Badge>
-                      ) : bookedCheckOut.status_description === "Checked In" ? (
+                      ) : bookedCheckOut.booking_status === "checked_in" ? (
                         <Badge color="warning" size="lg">
                           Checked In
                         </Badge>
-                      ) : bookedCheckOut.status_description === "Canceled" ? (
+                      ) : bookedCheckOut.booking_status === "cancelled" ? (
                         <Badge color="info" size="lg">
-                          Canceled
+                          Cancelled
                         </Badge>
                       ) : (
                         <Badge color="warning" size="lg">
@@ -307,6 +314,20 @@ export default function DashBookingCancel() {
           <h1 className="mt-3 mb-3 text-left font-semibold text-xl">
             Room Booking Cancel
           </h1>
+
+          {showAlert && (
+            <Alert
+              className="mb-3"
+              color={alertColor}
+              icon={HiInformationCircle}
+              onDismiss={() => setShowAlert(false)}
+            >
+              <span className="font-medium">
+                {alertColor === "success" ? "Success! " : "Error! "}
+              </span>{" "}
+              {alertMessage}
+            </Alert>
+          )}
 
           {fetchLoading ? (
             <div className="flex justify-center items-center h-96">
@@ -365,20 +386,17 @@ export default function DashBookingCancel() {
                           </TableCell>
 
                           <TableCell>
-                            {bookedDetails.status_description ===
-                            "Checked Out" ? (
+                            {bookedDetails.booking_status === "checked_out" ? (
                               <Badge color="success" size="lg">
                                 Checked Out
                               </Badge>
-                            ) : bookedDetails.status_description ===
-                              "Checked In" ? (
+                            ) : bookedDetails.booking_status === "checked_in" ? (
                               <Badge color="warning" size="lg">
                                 Checked In
                               </Badge>
-                            ) : bookedDetails.status_description ===
-                              "Canceled" ? (
+                            ) : bookedDetails.booking_status === "cancelled" ? (
                               <Badge color="info" size="lg">
-                                Canceled
+                                Cancelled
                               </Badge>
                             ) : (
                               <Badge color="warning" size="lg">

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Card, Spinner, Badge } from "flowbite-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { BsMailbox, BsPhone, BsCheckCircleFill } from "react-icons/bs";
 import { FaWifi, FaTv, FaSnowflake, FaCoffee } from "react-icons/fa";
 import FooterComponent from "../components/Footer";
@@ -22,6 +23,7 @@ const bookingSteps = [
 ];
 
 export default function Booking() {
+  const { currentUser } = useSelector((state) => state.user);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [roomCategory, setRoomCategory] = useState([]);
 
@@ -59,7 +61,7 @@ export default function Booking() {
               <p className="uppercase tracking-widest text-yellow-400 text-sm font-semibold mb-2">Accommodation</p>
               <h1 className="text-5xl font-bold mb-3">Rooms &amp; Suites</h1>
               <p className="text-gray-300 max-w-lg mx-auto">
-                Discover the perfect room for your stay at Adane Grand Hotel — from cosy standard rooms to expansive luxury suites.
+                Discover the perfect room for your stay at Galaxy Hotel — from cosy standard rooms to expansive luxury suites.
               </p>
             </div>
           </div>
@@ -123,7 +125,7 @@ export default function Booking() {
                             </p>
                           </div>
                         </div>
-                        <Link to="/sign-in">
+                        <Link to={currentUser ? "/dashboard?tab=booking-create" : "/sign-in"}>
                           <Button className="w-full bg-customBlue mt-2">Book This Room</Button>
                         </Link>
                       </Card>
@@ -141,7 +143,7 @@ export default function Booking() {
                 <p className="text-customBlue uppercase tracking-widest text-sm font-semibold mb-2">Simple Process</p>
                 <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">How to Book</h2>
                 <p className="text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
-                  Booking your stay at Adane Grand Hotel is quick and easy.
+                  Booking your stay at Galaxy Hotel is quick and easy.
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -172,7 +174,7 @@ export default function Booking() {
                       <div className="bg-white bg-opacity-10 p-2 rounded-lg">
                         <BsPhone className="text-xl text-yellow-400" />
                       </div>
-                      <span>+1 (123) 456-7890</span>
+                      <span>+251 974088153</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="bg-white bg-opacity-10 p-2 rounded-lg">
@@ -184,7 +186,7 @@ export default function Booking() {
                     </div>
                   </div>
                   <div className="flex gap-3">
-                    <Link to="/sign-in">
+                    <Link to={currentUser ? "/dashboard?tab=booking-create" : "/sign-in"}>
                       <Button size="lg" className="bg-yellow-400 text-customBlue font-bold border-0 hover:bg-yellow-300">Book Now</Button>
                     </Link>
                     <Link to="/contact-us">
@@ -193,7 +195,7 @@ export default function Booking() {
                   </div>
                 </div>
                 <div className="hidden md:block">
-                  <img src={image1} alt="Adane Grand Hotel room" className="rounded-2xl shadow-2xl" />
+                  <img src={image1} alt="Galaxy Hotel room" className="rounded-2xl shadow-2xl" />
                 </div>
               </div>
             </div>

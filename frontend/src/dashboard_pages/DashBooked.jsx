@@ -115,7 +115,9 @@ export default function DashBooked() {
   const fetchBookedDetails = async () => {
     try {
       setFetchLoading(true);
-      const res = await fetch(`/api/booking/get-all-details`);
+      const res = await fetch(`/api/booking/get-all-details`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (res.ok) {
         setBookedDetails(data.data);

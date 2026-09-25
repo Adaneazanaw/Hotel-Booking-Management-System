@@ -15,6 +15,7 @@ import {
 import { FaSpa, FaConciergeBell, FaParking, FaSwimmingPool } from "react-icons/fa";
 import { Link as ScrollLink } from "react-scroll";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import image1 from "../assets/heroSlider/1.jpg";
 import image2 from "../assets/heroSlider/2.jpg";
 import image3 from "../assets/heroSlider/3.jpg";
@@ -59,7 +60,7 @@ const testimonials = [
     initials: "JH",
     color: "bg-blue-600",
     review:
-      "Staying at Adane Grand Hotel was an unforgettable experience. The service was exceptional, the rooms immaculate, and the ambiance felt like home away from home.",
+      "Staying at Galaxy Hotel was an unforgettable experience. The service was exceptional, the rooms immaculate, and the ambiance felt like home away from home.",
     stars: 5,
   },
   {
@@ -83,6 +84,7 @@ const testimonials = [
 ];
 
 export default function Home() {
+  const { currentUser } = useSelector((state) => state.user);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [roomCategory, setRoomCategory] = useState([]);
 
@@ -127,7 +129,7 @@ export default function Home() {
                         transition={{ delay: 0.2 }}
                         className="uppercase tracking-widest text-sm font-medium text-yellow-400 mb-3"
                       >
-                        Adane Grand Hotel — Luxury &amp; Comfort
+                        Galaxy Hotel — Luxury &amp; Comfort
                       </motion.p>
                       <motion.h1
                         initial={{ opacity: 0, y: 10 }}
@@ -214,7 +216,7 @@ export default function Home() {
                             </p>
                           </div>
                         </div>
-                        <Link to="/sign-in">
+                        <Link to={currentUser ? "/dashboard?tab=booking-create" : "/sign-in"}>
                           <Button className="w-full bg-customBlue mt-2">Book Now</Button>
                         </Link>
                       </Card>
@@ -265,7 +267,7 @@ export default function Home() {
                       <div className="bg-white bg-opacity-10 p-2 rounded-lg">
                         <BsPhone className="text-xl text-yellow-400" />
                       </div>
-                      <span>+1 (123) 456-7890</span>
+                      <span>+251 974088153</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="bg-white bg-opacity-10 p-2 rounded-lg">
@@ -303,7 +305,7 @@ export default function Home() {
                 <p className="text-customBlue uppercase tracking-widest text-sm font-semibold mb-2">Guest Reviews</p>
                 <h2 className="text-4xl font-bold mb-4">What Our Guests Say</h2>
                 <p className="text-gray-500 max-w-xl mx-auto">
-                  Real experiences from real guests — this is what makes Adane Grand Hotel truly special.
+                  Real experiences from real guests — this is what makes Galaxy Hotel truly special.
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

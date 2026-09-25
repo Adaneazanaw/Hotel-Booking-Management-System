@@ -127,7 +127,9 @@ export default function DashCheckIn() {
   const fetchBookedDetails = async () => {
     try {
       setFetchLoading(true);
-      const res = await fetch(`/api/booking/get-pending-details`);
+      const res = await fetch(`/api/booking/get-pending-details`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (res.ok) {
         setBookedDetails(data.data);
@@ -154,6 +156,7 @@ export default function DashCheckIn() {
     try {
       const res = await fetch(`/api/booked/checkin`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -273,17 +276,17 @@ export default function DashCheckIn() {
                     <Label value="Status : " />
 
                     <div className="w-28">
-                      {bookedCheckOut.status_description === "Checked Out" ? (
+                      {bookedCheckOut.booking_status === "checked_out" ? (
                         <Badge color="success" size="lg">
                           Checked Out
                         </Badge>
-                      ) : bookedCheckOut.status_description === "Checked In" ? (
+                      ) : bookedCheckOut.booking_status === "checked_in" ? (
                         <Badge color="warning" size="lg">
                           Checked In
                         </Badge>
-                      ) : bookedCheckOut.status_description === "Canceled" ? (
+                      ) : bookedCheckOut.booking_status === "cancelled" ? (
                         <Badge color="info" size="lg">
-                          Canceled
+                          Cancelled
                         </Badge>
                       ) : (
                         <Badge color="warning" size="lg">
@@ -382,20 +385,17 @@ export default function DashCheckIn() {
                           </TableCell>
 
                           <TableCell>
-                            {bookedDetails.status_description ===
-                            "Checked Out" ? (
+                            {bookedDetails.booking_status === "checked_out" ? (
                               <Badge color="success" size="lg">
                                 Checked Out
                               </Badge>
-                            ) : bookedDetails.status_description ===
-                              "Checked In" ? (
+                            ) : bookedDetails.booking_status === "checked_in" ? (
                               <Badge color="warning" size="lg">
                                 Checked In
                               </Badge>
-                            ) : bookedDetails.status_description ===
-                              "Canceled" ? (
+                            ) : bookedDetails.booking_status === "cancelled" ? (
                               <Badge color="info" size="lg">
-                                Canceled
+                                Cancelled
                               </Badge>
                             ) : (
                               <Badge color="warning" size="lg">

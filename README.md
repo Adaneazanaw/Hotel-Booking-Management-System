@@ -1,174 +1,208 @@
+# Galaxy Hotel Management System
 
-# Hotel Booking Management System
+A modern hotel booking and operations platform built for internship practice and real-world business use. This project demonstrates a complete end-to-end workflow for managing room inventory, customer records, reservations, and administrative operations in a hotel environment.
 
-This project is a comprehensive Hotel Booking Management System designed to streamline hotel operations, including room and customer management, booking creation and cancellation, and administrative oversight. It provides a robust and user-friendly platform to manage hotel operations effectively.
+## Project Overview
 
----
+The system is designed to streamline hotel operations by providing:
+- A user-friendly customer-facing booking experience
+- A role-based admin dashboard for hotel staff
+- Secure authentication and session handling
+- Room category and room management
+- Reservation workflows including create, edit, and cancellation operations
+- Reporting and customer management features
 
-## Key Features
+This project is suitable for an internship report because it showcases practical software engineering skills including full-stack development, database modeling, API design, UI/UX work, and deployment-ready configuration.
 
-### 1. Room Management
-- Add, update, and delete room information, including room types, rates, and availability.
-- View detailed room statuses, such as occupancy and maintenance schedules.
+## Business Problem
 
-### 2. Customer Management
-- Maintain customer records with personal details and booking history.
-- Secure customer authentication and authorization mechanisms.
-- Send automated notifications for booking confirmations and updates.
+Hotels often manage bookings, room availability, customer details, and financial records through fragmented manual processes. This leads to delays, inaccuracies, poor tracking, and inefficient customer service. The goal of this project is to centralize these operations in one digital system.
 
-### 3. Booking System
-- Create, modify, and cancel bookings seamlessly.
-- Check real-time room availability.
-- Support for individual and group bookings.
+## Objectives
 
-### 4. Admin Dashboard
-- Access centralized control for managing all hotel operations.
-- Generate insightful analytics reports on bookings, revenue, and customer demographics.
-- Manage user roles and permissions (Admin, Staff, Customer).
+- Build a responsive hotel booking application
+- Manage customer and staff access with role-based authorization
+- Simplify room and booking management
+- Provide a clean dashboard for hotel administration
+- Deliver a professional, production-like web application experience
 
-### 5. Security Features
+## Core Features
 
+### Customer Experience
+- Browse hotel rooms and room categories
+- View luxury accommodation options
+- Book a room through a guided flow
+- Review hotel amenities and contact information
 
-## Technologies Used
+### Administrative Features
+- Dashboard overview for operational management
+- Manage users and admin profiles
+- Add, edit, and delete room categories
+- Manage customer records and bookings
+- Track booking status and check-in/check-out flows
+
+### Security and Access
+- Secure login and session handling
+- Role-based permissions for admin and staff actions
+- Protected pages and dashboard routes
+
+## Tech Stack
+
+### Frontend
+- React.js
+- Vite
+- Tailwind CSS
+- Flowbite React
+- Redux Toolkit
+- Framer Motion
 
 ### Backend
-- **Node.js**: For server-side logic and API management.
+- Node.js
+- Express.js
+- Sequelize ORM
+- SQLite for local development
+- MySQL-ready production configuration
 
 ### Other Tools
-- **Docker**: For containerizing the application and managing environments.
-- **Postman**: For API testing.
-- **Jest**: For unit and integration testing.
+- Firebase for profile image uploads
+- Docker support
+- Git and GitHub for project version control
 
----
+## Project Structure
 
-## Installation Guide
+```text
+Hotel-Booking-Management-System/
+├── backend/
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── utils/
+│   ├── config/
+│   ├── uploads/
+│   ├── app.js
+│   ├── server.js
+│   └── package.json
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   ├── index.html
+│   ├── vite.config.js
+│   └── package.json
+├── docs/
+├── docker-compose.yml
+├── README.md
+└── package.json
+```
+
+## Installation and Setup
 
 ### Prerequisites
-- **Node.js** (v14 or higher)
-- **MySQL** (v8.0 or higher)
-- **Docker** (optional but recommended for deployment)
+- Node.js 18 or later
+- npm or yarn
+- SQLite for local development
 
-### Step-by-Step Installation
+### 1. Clone the repository
 
-#### 1. Clone the Repository
 ```bash
-git clone https://github.com/FOT-Group-Project/Hotel-Booking-Management-System.git
+git clone <repository-url>
 cd Hotel-Booking-Management-System
 ```
 
-#### 2. Backend Setup
-- Navigate to the backend directory:
-  ```bash
-  cd backend
-  ```
-- Install dependencies:
-  ```bash
-  npm install
-  ```
-- Configure the database connection in the `.env` file:
-  ```env
-  DB_HOST=your_database_host
-  DB_USER=your_database_user
-  DB_PASS=your_database_password
-  DB_NAME=your_database_name
-  JWT_SECRET=your_jwt_secret
-  ```
-- Run database migrations:
-  ```bash
-  npx sequelize db:migrate
-  ```
-- Start the backend server:
-  ```bash
-  npm start
-  ```
+### 2. Install backend dependencies
 
-#### 3. Frontend Setup
-- Navigate to the frontend directory:
-  ```bash
-  cd ../frontend
-  ```
-- Install dependencies:
-  ```bash
-  npm install
-  ```
-- Start the frontend development server:
-  ```bash
-  npm start
-  ```
+```bash
+cd backend
+npm install
+```
 
-#### 4. Access the Application
-- Open your browser and navigate to `http://localhost:3000` to access the application.
+### 3. Install frontend dependencies
 
----
+```bash
+cd ../frontend
+npm install
+```
 
-## Database Schema
+### 4. Configure environment
 
-### Overview
-The system uses a MySQL database with the following main tables:
+Copy the example environment file and update values if needed.
 
-1. **Users**: Stores user details, roles, and authentication data.
-2. **Rooms**: Contains information about room types, rates, and availability.
-3. **Bookings**: Tracks all booking transactions, including status and timestamps.
-4. **Payments**: Manages payment records, including amounts and payment methods.
+```bash
+cd backend
+cp .env.example .env
+```
 
----
+For local development, the app is already configured to run with SQLite and a development secret key. Adjust values if you are switching to MySQL or production settings.
 
-## Contributing
+### 5. Run the application
 
-We welcome contributions to enhance the functionality of this system. Please follow these steps:
+Start the backend:
 
-1. **Fork the Repository**:
-   - Click the "Fork" button at the top right corner of this page.
-2. **Clone Your Fork**:
-   ```bash
-   git clone https://github.com/your-username/Hotel-Booking-Management-System.git
-   cd Hotel-Booking-Management-System
-   ```
-3. **Create a Branch**:
-   ```bash
-   git checkout -b feature-name
-   ```
-4. **Make Your Changes**:
-   - Implement your feature or fix bugs.
-5. **Commit and Push**:
-   ```bash
-   git add .
-   git commit -m "Description of your changes"
-   git push origin feature-name
-   ```
-6. **Submit a Pull Request**:
-   - Go to the original repository and click "New Pull Request".
+```bash
+cd backend
+npm start
+```
 
----
+Start the frontend:
 
-## Deployment
+```bash
+cd frontend
+npm run dev
+```
 
-### Using Docker
-1. Build the Docker images:
-   ```bash
-   docker-compose build
-   ```
-2. Start the containers:
-   ```bash
-   docker-compose up
-   ```
-3. Access the application on `http://localhost`.
+Open the app in your browser:
 
-### Manual Deployment
-- Follow the backend and frontend setup steps on the server environment.
-- Use a process manager like PM2 for the backend.
-- Use a production-ready frontend build (`npm run build`) for deployment.
+```text
+http://localhost:5173
+```
 
----
+## Database Overview
+
+The application uses a relational model with entities including:
+- Users
+- Roles and access permissions
+- Rooms
+- Room categories
+- Customers
+- Bookings
+- Check-in and check-out records
+- Payments
+- Audit logs
+- Feedback
+
+## Role-Based Access
+
+The project includes separated responsibilities for:
+- Admin
+- Manager
+- Receptionist
+
+This makes the system more realistic for enterprise hotel operations and demonstrates proper access control patterns.
+
+## Internship Report Value
+
+This project highlights the following skills often expected in software engineering internships:
+- Full-stack web development
+- Database design and integration
+- REST API creation
+- Frontend architecture with reusable components
+- Authentication and authorization
+- Responsive UI design
+- Deployment readiness and environment configuration
+
+## Suggested Future Enhancements
+
+- Real-time room availability updates
+- Payment gateway integration
+- Email and SMS notifications
+- Advanced analytics dashboard
+- Multi-language support
+- Mobile-first optimizations
+- Cloud deployment with Azure or AWS
 
 ## License
-This project is licensed under the MIT License. See the `LICENSE` file for details.
 
----
+This project is intended for educational and internship demonstration purposes.
 
-## Contact
-For any inquiries or support, please contact the project maintainers through the repository's GitHub page.
+## Conclusion
 
----
-
-This README provides a detailed overview of the Hotel Booking Management System, including setup instructions, key features, and contributing guidelines. For additional details, refer to the documentation in the repository.
+The Galaxy Hotel Management System is a complete and practical web application that demonstrates professional software development for a hotel business domain. It is structured to be both usable and presentation-ready for academic and internship reporting.

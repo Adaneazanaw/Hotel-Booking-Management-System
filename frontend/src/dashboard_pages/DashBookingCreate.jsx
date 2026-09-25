@@ -32,34 +32,28 @@ export default function DashBookingCreate() {
   const { currentUser } = useSelector((state) => state.user);
 
   const [formData, setFormData] = useState({
-    category_name: "",
-    price: "",
-    description: "",
-    image: null,
+    customer_id: "",
+    room_id: "",
+    check_in: "",
+    check_out: "",
   });
 
   const [customer, setCustomer] = useState([]);
   const [room, setRoom] = useState([]);
   const [bookingDetails, setBookingDetails] = useState([]);
 
-  const [roomCategory, setRoomCategory] = useState([]);
-  const [createLoading, setCreateLoading] = useState(null);
-  const [updateLoading, setUpdateLoading] = useState(null);
-  const [fetchLoading, setFetchLoading] = useState(null);
+  const [createLoading, setCreateLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertColor, setAlertColor] = useState("failure");
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [openModalEdit, setOpenModalEdit] = useState(false);
-  const [image, setImage] = useState(null);
-
-  const [userIdToDelete, setUserIdToDelete] = useState(null);
-  const [editedCategory, setEditedCategory] = useState(null);
 
   const fetchCustomer = async () => {
     try {
       setFetchLoading(true);
-      const res = await fetch(`/api/customer/getcustomers`);
+      const res = await fetch(`/api/customer/getcustomers`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (res.ok) {
         setCustomer(data.customers);
@@ -74,7 +68,9 @@ export default function DashBookingCreate() {
   const fetchRoom = async () => {
     try {
       setFetchLoading(true);
-      const res = await fetch(`/api/room/getroom-all-details`);
+      const res = await fetch(`/api/room/getroom-all-details`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (res.ok) {
         setRoom(data.rooms);
@@ -89,7 +85,9 @@ export default function DashBookingCreate() {
   const fetchBookingDetails = async () => {
     try {
       setFetchLoading(true);
-      const res = await fetch(`/api/booking/get-all-details`);
+      const res = await fetch(`/api/booking/get-all-details`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (res.ok) {
         setBookingDetails(data.data);
@@ -171,6 +169,7 @@ export default function DashBookingCreate() {
     try {
       const res = await fetch(`/api/booking/create`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -179,7 +178,12 @@ export default function DashBookingCreate() {
       const data = await res.json();
       if (res.ok) {
         setCreateLoading(false);
-        setFormData({});
+        setFormData({
+          customer_id: "",
+          room_id: "",
+          check_in: "",
+          check_out: "",
+        });
         fetchBookingDetails();
         setShowAlert(true);
         setAlertColor("success");
@@ -248,6 +252,7 @@ export default function DashBookingCreate() {
                     <Label value="Select a Customer" />
                   </div>
                   <Select
+                    value={formData.customer_id}
                     onChange={(e) => {
                       setFormData({
                         ...formData,
@@ -272,15 +277,16 @@ export default function DashBookingCreate() {
                   <div className="flex gap-4 mb-2 text-sm">
                     <span className="inline-flex items-center gap-1">
                       <span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
-                      Available: {room.filter((r) => r.status.toLowerCase() === "available").length}
+                      Available: {room.filter((r) => r.status && r.status.toLowerCase() === "available").length}
                     </span>
                     <span className="inline-flex items-center gap-1">
                       <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
-                      Occupied: {room.filter((r) => r.status.toLowerCase() !== "available").length}
+                      Occupied: {room.filter((r) => !r.status || r.status.toLowerCase() !== "available").length}
                     </span>
                     <span className="text-gray-500">Total: {room.length}</span>
                   </div>
                   <Select
+                    value={formData.room_id}
                     onChange={(e) => {
                       setFormData({
                         ...formData,
@@ -292,7 +298,7 @@ export default function DashBookingCreate() {
                   >
                     <option value="">Select a Room</option>
                     {room.map((r) => {
-                      const isAvailable = r.status.toLowerCase() === "available";
+                      const isAvailable = r.status && r.status.toLowerCase() === "available";
                       return (
                         <option key={r.id} value={r.id} disabled={!isAvailable}>
                           {r.room_name} - {r.category_name} - Rs. {r.price} - {isAvailable ? "✅ Available" : "🔴 Occupied"}
@@ -307,6 +313,7 @@ export default function DashBookingCreate() {
                   <TextInput
                     id="check_in"
                     type="datetime-local"
+                    value={formData.check_in}
                     required
                     shadow
                     onChange={(e) => {
@@ -323,6 +330,7 @@ export default function DashBookingCreate() {
                   <TextInput
                     id="check_out"
                     type="datetime-local"
+                    value={formData.check_out}
                     required
                     shadow
                     onChange={(e) => {

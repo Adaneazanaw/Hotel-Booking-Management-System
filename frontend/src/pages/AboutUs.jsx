@@ -97,7 +97,7 @@ export default function AboutUs() {
               <p className="uppercase tracking-widest text-yellow-400 text-sm font-semibold mb-2">Our Story</p>
               <h1 className="text-5xl font-bold mb-3">About Us</h1>
               <p className="text-gray-300 max-w-lg mx-auto">
-                A legacy of luxury, comfort, and exceptional service — welcome to Adane Grand Hotel.
+                A legacy of luxury, comfort, and exceptional service — welcome to Galaxy Hotel.
               </p>
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function AboutUs() {
                     A Landmark of Luxury in the Heart of the City
                   </h2>
                   <p className="text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
-                    Founded over 25 years ago, Adane Grand Hotel has earned its reputation as one of the
+                    Founded over 25 years ago, Galaxy Hotel has earned its reputation as one of the
                     city's premier luxury destinations. Nestled in the heart of the city, our hotel
                     blends timeless elegance with modern comfort.
                   </p>
@@ -126,7 +126,7 @@ export default function AboutUs() {
                   </Link>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <img src={image1} alt="Adane Grand Hotel lobby" className="rounded-2xl shadow-md w-full h-48 object-cover" />
+                  <img src={image1} alt="Galaxy Hotel lobby" className="rounded-2xl shadow-md w-full h-48 object-cover" />
                   <img src={image2} alt="Luxury suite" className="rounded-2xl shadow-md w-full h-48 object-cover mt-6" />
                   <img src={image3} alt="Hotel exterior" className="rounded-2xl shadow-md w-full h-48 object-cover col-span-2" />
                 </div>
@@ -229,7 +229,7 @@ export default function AboutUs() {
               <p className="uppercase tracking-widest text-yellow-400 text-sm font-semibold mb-3">Ready to Experience It?</p>
               <h2 className="text-4xl font-bold mb-5">Begin Your Luxury Journey Today</h2>
               <p className="text-gray-300 max-w-xl mx-auto mb-8">
-                Whether you're visiting for business or leisure, Adane Grand Hotel promises an experience you'll never forget.
+                Whether you're visiting for business or leisure, Galaxy Hotel promises an experience you'll never forget.
               </p>
               <div className="flex gap-4 justify-center">
                 <Link to="/sign-in">

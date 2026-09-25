@@ -117,19 +117,22 @@ export default function DashBookingEdit() {
 
   const formatDateTimeLocal = (date) => {
     if (!date) return "";
+    // Use UTC components so the pre-filled value matches the stored UTC timestamp
     const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(d.getUTCDate()).padStart(2, "0");
+    const hours = String(d.getUTCHours()).padStart(2, "0");
+    const minutes = String(d.getUTCMinutes()).padStart(2, "0");
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
   const fetchBookedDetails = async () => {
     try {
       setFetchLoading(true);
-      const res = await fetch(`/api/booking/get-pending-details`);
+      const res = await fetch(`/api/booking/get-pending-details`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (res.ok) {
         setBookedDetails(data.data);
@@ -152,7 +155,9 @@ export default function DashBookingEdit() {
   const fetchRoom = async () => {
     try {
       setFetchLoading(true);
-      const res = await fetch(`/api/room/getroom-all-details`);
+      const res = await fetch(`/api/room/getroom-all-details`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (res.ok) {
         setRoom(data.rooms);
@@ -170,6 +175,7 @@ export default function DashBookingEdit() {
       setCreateLoading(true);
       const res = await fetch(`/api/booking/edit`, {
         method: "PUT",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -219,9 +225,9 @@ export default function DashBookingEdit() {
   useEffect(() => {
     if (openModal && bookedCheckOut) {
       setFormData({
-        new_room_id: bookedCheckOut.new_room_id || "",
-        name: bookedCheckOut.name || "",
-        contact_no: bookedCheckOut.contact_no || "",
+        new_room_id: bookedCheckOut.room_id || "",
+        name: bookedCheckOut.customer_name || "",
+        contact_no: bookedCheckOut.customer_phone || "",
         date_in: formatDateTimeLocal(bookedCheckOut.date_in),
         date_out: formatDateTimeLocal(bookedCheckOut.date_out),
       });
@@ -321,20 +327,17 @@ export default function DashBookingEdit() {
                         <Label value="Status : " />
 
                         <div className="w-28">
-                          {bookedCheckOut.status_description ===
-                          "Checked Out" ? (
+                          {bookedCheckOut.booking_status === "checked_out" ? (
                             <Badge color="success" size="lg">
                               Checked Out
                             </Badge>
-                          ) : bookedCheckOut.status_description ===
-                            "Checked In" ? (
+                          ) : bookedCheckOut.booking_status === "checked_in" ? (
                             <Badge color="warning" size="lg">
                               Checked In
                             </Badge>
-                          ) : bookedCheckOut.status_description ===
-                            "Canceled" ? (
+                          ) : bookedCheckOut.booking_status === "cancelled" ? (
                             <Badge color="info" size="lg">
-                              Canceled
+                              Cancelled
                             </Badge>
                           ) : (
                             <Badge color="warning" size="lg">
@@ -364,13 +367,15 @@ export default function DashBookingEdit() {
                           value={formData.new_room_id}
                         >
                           <option value="">Select a Room</option>
-                          {room.map((room) => (
-                            <option key={room.id} value={room.id}>
-                              {room.room_name} {" - "} {room.category_name}{" "}
-                              {" - Rs. "}
-                              {room.price} {" - "} {room.status.toUpperCase()}
-                            </option>
-                          ))}
+                          {room.map((r) => {
+                            const isCurrentRoom = Number(r.id) === Number(bookedCheckOut?.room_id);
+                            const isAvailable = (r.status && r.status.toLowerCase() === "available") || isCurrentRoom;
+                            return (
+                              <option key={r.id} value={r.id} disabled={!isAvailable}>
+                                {r.room_name} - {r.category_name} - Rs. {r.price} - {isCurrentRoom ? "(Current Room)" : isAvailable ? "✅ Available" : "🔴 Occupied"}
+                              </option>
+                            );
+                          })}
                         </Select>
                       </div>
 
@@ -497,20 +502,17 @@ export default function DashBookingEdit() {
                           </TableCell>
 
                           <TableCell>
-                            {bookedDetails.status_description ===
-                            "Checked Out" ? (
+                            {bookedDetails.booking_status === "checked_out" ? (
                               <Badge color="success" size="lg">
                                 Checked Out
                               </Badge>
-                            ) : bookedDetails.status_description ===
-                              "Checked In" ? (
+                            ) : bookedDetails.booking_status === "checked_in" ? (
                               <Badge color="warning" size="lg">
                                 Checked In
                               </Badge>
-                            ) : bookedDetails.status_description ===
-                              "Canceled" ? (
+                            ) : bookedDetails.booking_status === "cancelled" ? (
                               <Badge color="info" size="lg">
-                                Canceled
+                                Cancelled
                               </Badge>
                             ) : (
                               <Badge color="warning" size="lg">

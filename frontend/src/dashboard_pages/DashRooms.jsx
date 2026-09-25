@@ -68,7 +68,9 @@ export default function DashRooms() {
   const fetchRoom = async () => {
     try {
       setFetchLoading(true);
-      const res = await fetch(`/api/room/getroom-all-details`);
+      const res = await fetch(`/api/room/getroom-all-details`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (res.ok) {
         setRoom(data.rooms);
@@ -126,6 +128,7 @@ export default function DashRooms() {
       // Send formData as JSON
       const res = await fetch(`/api/room/create`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -166,6 +169,7 @@ export default function DashRooms() {
     try {
       const res = await fetch(`/api/room/delete/${userIdToDelete}`, {
         method: "DELETE",
+        credentials: "include",
       });
       const data = await res.json();
       if (res.ok) {
@@ -191,6 +195,7 @@ export default function DashRooms() {
       setUpdateLoading(true);
       const res = await fetch(`/api/room/update`, {
         method: "PATCH",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },

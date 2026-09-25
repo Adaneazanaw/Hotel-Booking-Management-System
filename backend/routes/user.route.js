@@ -5,8 +5,12 @@ const { requireRole } = require("../utils/authorize");
 
 const router = express.Router();
 
-router.use(verifyToken, requireRole("admin", "manager"));
+router.use(verifyToken);
+router.get("/me", userController.getCurrentUser);
+router.put("/update/:id", userController.updateUser);
+router.put("/updateuser/:id", requireRole("admin", "manager"), userController.updateUser);
 
+router.use(requireRole("admin", "manager"));
 router.get("/getusers", userController.getUsers);
 router.post("/create", userController.createUser);
 router.delete("/delete/:id", userController.deleteUser);

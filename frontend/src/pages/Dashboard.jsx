@@ -24,9 +24,7 @@ export default function Dashboard() {
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const tabFromUrl = urlParams.get("tab");
-    if (tabFromUrl) {
-      setTab(tabFromUrl);
-    }
+    setTab(tabFromUrl || "dash");
   }, [location.search]);
 
   return (
@@ -50,7 +48,7 @@ export default function Dashboard() {
       {/* check out */}
       {tab === "check-out" && <DashCheckOut />}
       {/* booked */}
-      {tab === "booked" && <DashBooked />}
+      {(tab === "booked" || tab === "booking") && <DashBooked />}
       {/* booking cancel */}
       {tab === "booking-cancel" && <DashBookingCancel />}
       {/* booking edit */}

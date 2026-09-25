@@ -9,7 +9,7 @@ import FooterComponent from "../components/Footer";
 import image1 from "../assets/heroSlider/1.jpg";
 
 const contactInfo = [
-  { icon: <BsPhone className="text-2xl text-customBlue" />, label: "Phone", value: "+1 (123) 456-7890", sub: "Mon–Fri, 8am – 8pm" },
+  { icon: <BsPhone className="text-2xl text-customBlue" />, label: "Phone", value: "+251 974088153", sub: "Mon–Fri, 8am – 8pm" },
   { icon: <BsMailbox className="text-2xl text-customBlue" />, label: "Email", value: "info@adanegrand.com", sub: "We reply within 24 hours" },
   { icon: <BsGeoAlt className="text-2xl text-customBlue" />, label: "Address", value: "12 Grand Avenue, Adane", sub: "City Centre" },
   { icon: <BsClock className="text-2xl text-customBlue" />, label: "Reception Hours", value: "24 / 7", sub: "Always here for you" },
@@ -59,7 +59,7 @@ export default function ContactUs() {
               </p>
               <h1 className="text-5xl font-bold mb-3">Contact Us</h1>
               <p className="text-gray-300 max-w-lg mx-auto">
-                Our team at Adane Grand Hotel is available around the clock to assist
+                Our team at Galaxy Hotel is available around the clock to assist
                 you with reservations, enquiries, and anything else you need.
               </p>
             </div>
@@ -166,7 +166,7 @@ export default function ContactUs() {
                       Our reception team is available 24/7 to assist with any urgent requests.
                     </p>
                     <a
-                      href="tel:+11234567890"
+                      href="tel:+251974088153"
                       className="inline-flex items-center gap-2 bg-yellow-400 text-customBlue font-bold px-5 py-2 rounded-lg hover:bg-yellow-300 transition-colors text-sm"
                     >
                       <BsPhone />
